@@ -36,7 +36,7 @@ public class Main{
     
     
     public static void signInEvent(String token){
-        Settings.getInstance().setToken(token);
+        Settings.getInstance().setToken(token, false);
         new API(token);
         userLoaded = User.loadMainUser();
         if(userLoaded){
@@ -46,6 +46,7 @@ public class Main{
     
     public static boolean OauthRequestEvent(String code){
         String token = API.tradeCode(code);
+        Settings.getInstance().setToken(token, true);
         new API(token);
         userLoaded = User.loadMainUser();
         if(userLoaded){
@@ -78,21 +79,27 @@ public class Main{
 
     public static void main(String[] args){
         // This approach uses an http request library to directly talk to the github api, More work but more control.
-        
-        settingsLoaded = Settings.load();
+        FlatDarculaLaf.setup();
+        mw = new MainWin();
         userLoaded = false;
+        settingsLoaded = Settings.load();
+        
         if(settingsLoaded){
+            if(Settings.getInstance().isOauthToken()){
+                System.out.println("Loaded OauthToken");
+            }
             new API(Settings.getInstance().getToken());
             userLoaded = User.loadMainUser();
         }
         
-        FlatDarculaLaf.setup();
-        mw = new MainWin();
-        
         if(userLoaded){
             mw.setUser(User.getMainUser());
         }
+        else if(Settings.getInstance().isOauthToken()){
+            OauthSigninEvent();
+        }
         mw.setVisible(true);
+       
         
         try{
             

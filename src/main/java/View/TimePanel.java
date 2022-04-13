@@ -5,10 +5,13 @@
 package View;
 
 import Model.Rep;
+import Model.User;
 import java.awt.Color;
 import java.awt.Graphics;
 
 import com.mycompany.vp2final.TimelineChangeHandler;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -16,35 +19,46 @@ import java.util.ArrayList;
  * @author Noahb
  */
 public class TimePanel extends javax.swing.JPanel {
+    private User user;
+    private ArrayList<DayNode> days;
     private ArrayList<RepNode> nodes;
     private ArrayList<RepNode> nodesInWindow;
     private ArrayList<TimelineChangeHandler> observers;
-    //private static RepNode test2 = new RepNode(200, 200, 50, 50);
-    private int zoom;
-    private int halfZoom;
+    
+    private LocalDateTime minDate;
+    private LocalDateTime maxDate;
+    private Duration dateRange;
     
     private int w;
     private int h;
-    
     private int halfW;
     private int halfH;
     
-    private int winMinX;
-    private int winMaxX;
+    private int zoom;
+    private int halfZoom;
     
     private int maxX;
     
+    private int winMinX;
+    private int winMaxX;
+    private int dayWidth;
+    
     private boolean updated;
+    
+    
     /**
      * Creates new form test
      */
     public TimePanel() {
         nodes = new ArrayList();
         nodesInWindow = new ArrayList();
+        days = new ArrayList();
         observers = new ArrayList();
         //nodes.add(new RepNode(100, 200, 50, 50, "Visual II Final"));
         //nodes.add(new RepNode(700, 200, 50, 50, "test rep2"));
         updated = false;
+        dayWidth = 80;
+        maxDate = LocalDateTime.now();
         setZoom(20);
         initComponents();
     }
@@ -59,14 +73,28 @@ public class TimePanel extends javax.swing.JPanel {
         observers.add(handler);
     }
     
+    public void setUser(User user){
+        this.user = user;
+        minDate = this.user.getDateCreated();
+        dateRange = Duration.between(minDate, maxDate);
+        
+        maxX = (int)dateRange.toDays() * dayWidth;
+        System.out.println(maxX);
+        setNodes(user.getReps());
+        repaint();
+    }
+    public void updateDays(){
+        for(DayNode day : days){
+            day.zoomUpdate(dayWidth);
+        }
+    }
     public void setNodes(Rep[] reps){
         nodes.clear();
         for(int i = 0; i < reps.length; i++){
             nodes.add(new RepNode(reps[i], (i + 1) * 200, 200, 50, 50));
         }
         int lastIndex = nodes.size() - 1;
-        maxX = nodes.get(lastIndex).getX() + (nodes.get(lastIndex).getW() * 2);
-        repaint();
+        //maxX = nodes.get(lastIndex).getX() + (nodes.get(lastIndex).getW() * 2);
     }
     
     public void setZoom(int val){
@@ -74,10 +102,13 @@ public class TimePanel extends javax.swing.JPanel {
         halfZoom = zoom / 2;
     }
     
-    public void changeZoom(int val){
-        zoom += val;
-        halfZoom = zoom / 2;
-        
+    public void changeZoom(int mod){
+        //zoom += 10 * mod;
+        dayWidth += 10 * mod;
+        maxX = (int)dateRange.toDays() * dayWidth;
+        //halfZoom = zoom / 2;
+        updateDays();
+        repaint();
     }
     public void changeWindow(int val){
         if(val > 0){
@@ -106,6 +137,11 @@ public class TimePanel extends javax.swing.JPanel {
         this.halfW = w/2;
         this.halfH = h/2;
         if(!updated){
+            if(dateRange != null){
+                for(int i = 0; i < dateRange.toDays(); i++){
+                    days.add(new DayNode(i, i * dayWidth, halfH - halfZoom - 2, 4, 4));
+                }   
+            }
             winMinX = 0;
             winMaxX = w;
             updated = true;
@@ -116,7 +152,8 @@ public class TimePanel extends javax.swing.JPanel {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         updateDimesions();
-        //System.out.println(winMinX + "-" + winMaxX + ": " + test.getX() + ", " + (winMinX - test.getX()) + ": " + test.InXRange(winMinX, winMaxX));
+        
+        //System.out.println(winMinX + "-" + winMaxX);
         //g.fillRect(winMinX, halfH-25, 10, 50);
         //g.fillRect(winMaxX - 10, halfH-25, 10, 50);
         
@@ -125,7 +162,15 @@ public class TimePanel extends javax.swing.JPanel {
         g.setColor(Color.BLACK);
         
         g.fillRect(0, halfH - halfZoom, w, zoom);
-        
+        g.setColor(Color.WHITE);
+        if(dateRange != null){
+            for(DayNode day : days){
+                if(day.InXRange(winMinX, winMaxX)){
+                    day.draw(g, winMinX);
+                }
+            }
+        }
+        /*
         nodesInWindow.clear();
         for(RepNode node : nodes){
             if(node.InXRange(winMinX, winMaxX)){
@@ -133,7 +178,7 @@ public class TimePanel extends javax.swing.JPanel {
                 node.draw(g, winMinX);
             }
         }
-        
+        */
         g.setColor(temp);
     }
 

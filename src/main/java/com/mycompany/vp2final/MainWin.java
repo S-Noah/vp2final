@@ -21,12 +21,11 @@ public class MainWin extends javax.swing.JFrame{
     public MainWin() {
         initComponents();
         searchUserPanel.setVisible(false);
-        //signInPanel.addObserver(this);
     }
     
     public void setUser(User user){
         this.user = user;
-        pnlTimeline.setUser(user);
+        winTimeline.setUser(user);
         
         if(user.ownsMediaRep()){
             repMediaManagerPanel.setUser(user);
@@ -34,19 +33,12 @@ public class MainWin extends javax.swing.JFrame{
         else{
             repMediaManagerPanel.clear();
         }
-        changePanel("timelinePanel");
+        changePanel("timelineWindow");
     }
     public void changePanel(String cardName){
         CardLayout cardLayout = (CardLayout)pnlMain.getLayout();
         cardLayout.show(pnlMain, cardName);
     }
-    
-    /*
-    @Override 
-    public void onUpdate(){
-        changePanel("timelinePanel");
-    }
-    */
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -60,7 +52,7 @@ public class MainWin extends javax.swing.JFrame{
         pnlMain = new javax.swing.JPanel();
         signInPanel = new View.SignInPanel();
         repMediaManagerPanel = new View.RepMediaManagerPanel();
-        pnlTimeline = new View.TimelineWindowPanel();
+        winTimeline = new View.TimelineWindowPanel();
         searchUserPanel = new View.SearchUserPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -83,7 +75,7 @@ public class MainWin extends javax.swing.JFrame{
         pnlMain.setLayout(new java.awt.CardLayout());
         pnlMain.add(signInPanel, "signInPanel");
         pnlMain.add(repMediaManagerPanel, "repMediaManagerPanel");
-        pnlMain.add(pnlTimeline, "timelinePanel");
+        pnlMain.add(winTimeline, "timelineWindow");
 
         jMenu1.setText("Social");
         jMenu1.addActionListener(new java.awt.event.ActionListener() {
@@ -158,7 +150,7 @@ public class MainWin extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void itemViewTimelineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemViewTimelineActionPerformed
-        changePanel("timelinePanel");
+        changePanel("timelineWindow");
     }//GEN-LAST:event_itemViewTimelineActionPerformed
 
     private void itemViewRepMediaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemViewRepMediaActionPerformed
@@ -189,9 +181,9 @@ public class MainWin extends javax.swing.JFrame{
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel pnlMain;
-    private View.TimelineWindowPanel pnlTimeline;
     private View.RepMediaManagerPanel repMediaManagerPanel;
     private View.SearchUserPanel searchUserPanel;
     private View.SignInPanel signInPanel;
+    private View.TimelineWindowPanel winTimeline;
     // End of variables declaration//GEN-END:variables
 }

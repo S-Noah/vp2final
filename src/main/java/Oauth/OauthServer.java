@@ -36,20 +36,24 @@ public class OauthServer{
            Main.OauthRequestEvent(s);
             
             try{
+                FileInputStream fs;
                 while(true){
                     if(Main.userLoaded){
                         break;
                     }
                 }
                 if(Main.userLoaded){
-                    FileInputStream fs = new FileInputStream("Oauth/AuthSuccessPage.html");
-                    OutputStream os = exchange.getResponseBody();
-                    
-                    byte response[] = fs.readAllBytes();
-                    exchange.sendResponseHeaders(200, response.length);
-                    os.write(response);
-                    os.close();
+                    fs = new FileInputStream("Oauth/AuthSuccessPage.html");
                 }
+                else{
+                    fs = new FileInputStream("Oauth/AuthFailedPage.html");
+                }
+                OutputStream os = exchange.getResponseBody();
+                
+                byte response[] = fs.readAllBytes();
+                exchange.sendResponseHeaders(200, response.length);
+                os.write(response);
+                os.close();
                 
             }
             catch(IOException e){

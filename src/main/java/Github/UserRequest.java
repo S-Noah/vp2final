@@ -36,6 +36,15 @@ public class UserRequest implements Serializable{
     protected int public_repos;
     protected int followers;
     protected int following;
+    protected String created_at;
+
+    public String getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(String created_at) {
+        this.created_at = created_at;
+    }
 
     public String getLogin() {
         return login;
@@ -242,5 +251,6 @@ public class UserRequest implements Serializable{
         public_repos = userRequest.getPublic_repos();
         followers = userRequest.getFollowers();
         following = userRequest.getFollowing();
+        created_at = userRequest.getCreated_at();
     }
 }

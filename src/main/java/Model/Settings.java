@@ -15,7 +15,6 @@ public class Settings implements Serializable{
             return false;
         }
         else{
-            new API(instance.token);
             instance.loadedSettings = true;
             return true;
         }
@@ -29,7 +28,8 @@ public class Settings implements Serializable{
     }
     
     private String token;
-    boolean loadedSettings;
+    private boolean loadedSettings;
+    private boolean isOauthToken;
     
     private Settings(){
         loadedSettings = false;
@@ -37,12 +37,16 @@ public class Settings implements Serializable{
     public boolean wasLoaded(){
         return loadedSettings;
     }
+    public boolean isOauthToken(){
+        return isOauthToken;
+    }
     
     public String getToken(){
         return token;
     }
-    public void setToken(String token){
+    public void setToken(String token, boolean isOauthToken){
         this.token = token;
+        this.isOauthToken = isOauthToken;
         save();
     }
     private void save(){

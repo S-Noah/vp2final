@@ -12,30 +12,34 @@ import java.io.Serializable;
  * @author Noahb
  */
 public class RepRequest implements Serializable{
-    
-    
+    // Identification Fields.
     protected int id;
     protected String node_id;
     protected String name;
     protected String full_name;
-
     protected RepOwner owner;
-
+    
+    // API Extension URLs.
     protected String html_url;
-    protected String description;
-    protected boolean fork;
     protected String commits_url;
-
+    
+    // Statistic Fields.
     protected String url;
     protected String language;
+    protected String description;
+    protected boolean fork;
     protected int forks;
     protected int forks_count;
     protected int stargazers_count;
     protected int watchers_count;
     protected int size;
     protected int subscribers;
-
     protected String created_at;
+    protected String pushed_at;
+
+    public String getPushed_at() {
+        return pushed_at;
+    }
 
     public String getHtml_url() {
         return html_url;
@@ -136,6 +140,7 @@ public class RepRequest implements Serializable{
         size = repRequest.getSize();
         subscribers = repRequest.getSubscribers();
         created_at = repRequest.getCreated_at();
+        pushed_at = repRequest.getPushed_at();
         ;
     }
 }

@@ -134,10 +134,10 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="View.TimelineWindowPanel" name="pnlTimeline">
+        <Component class="View.TimelineWindowPanel" name="winTimeline">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
-              <CardConstraints cardName="timelinePanel"/>
+              <CardConstraints cardName="timelineWindow"/>
             </Constraint>
           </Constraints>
         </Component>
