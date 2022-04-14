@@ -19,7 +19,7 @@ public class TimelineWindow extends javax.swing.JFrame {
         initComponents();
     }
     public void updateTimelineNodes(Rep[] reps){
-        pnlTimeline.setNodes(reps);
+        pnlTimeline.setRepNodes(reps);
     }
 
     /**

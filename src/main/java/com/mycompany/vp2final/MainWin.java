@@ -132,7 +132,7 @@ public class MainWin extends javax.swing.JFrame{
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(pnlMain, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(pnlMain, javax.swing.GroupLayout.DEFAULT_SIZE, 1088, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(

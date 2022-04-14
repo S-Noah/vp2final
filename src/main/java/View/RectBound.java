@@ -37,7 +37,6 @@ abstract public class RectBound {
     public void setY(int y) {
         this.y = y;
     }
-
     public int getW() {
         return w;
     }

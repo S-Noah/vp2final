@@ -11,31 +11,39 @@ import java.awt.Graphics;
  *
  * @author NoahS
  */
-public class DayNode extends RectBound{
+public class TemporalNode extends RectBound{
     int halfW, halfH, quarterW;
-    String index;
     int i;
+    boolean isBottom;
+    String name;
     
-    public DayNode(int i, int x, int y, int w, int h){
+    public TemporalNode(String name, int i, boolean isBottom, int x, int y, int w, int h){
         super(x, y, w, h);
+        this.name = name;
+        this.i = i;
+        this.isBottom = isBottom;
+        
         halfW = w/2;
         halfH = h/2;
         quarterW = halfW/2;
-        this.i = i;
-        this.index = String.valueOf(i);
     }
-    public void zoomUpdate(int dayWidth){
-        this.x = i * dayWidth;
+    public void zoomUpdate(int space){
+        this.x = (i + 1) * space;
     }
     public boolean InXRange(int x1, int x2){
         return (x + halfW >= x1 && x - halfW <= x2);
     }
     public void draw(Graphics g, int minX){
-        int quarterTextW = g.getFontMetrics().stringWidth(index) / 4;
+        int quarterTextW = g.getFontMetrics().stringWidth(name) / 4;
         int newX = x - minX;
         g.setColor(Color.WHITE);
         g.fillOval(newX, y, w, h);
         g.setColor(Color.BLACK);
-        g.drawString(index, newX + quarterW - quarterTextW, y - 5);
+        if(isBottom){
+            g.drawString(name, newX + quarterW - quarterTextW, y + 15);
+        }
+        else{
+            g.drawString(name, newX + quarterW - quarterTextW, y - 5);
+        }
     }
 }
