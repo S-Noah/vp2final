@@ -41,7 +41,7 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
         pnlTimeline = new View.TimePanel();
         githubUserInfoPanel1 = new View.GithubUserInfoPanel();
         repInfoPanel = new View.RepInfoPanel();
-        jScrollBar1 = new javax.swing.JScrollBar();
+        timelineScrollBar = new javax.swing.JScrollBar();
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -61,12 +61,12 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
             .addGap(0, 500, Short.MAX_VALUE)
         );
 
-        jScrollBar1.setBlockIncrement(1);
-        jScrollBar1.setMaximum(300);
-        jScrollBar1.setOrientation(javax.swing.JScrollBar.HORIZONTAL);
-        jScrollBar1.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
+        timelineScrollBar.setBlockIncrement(1);
+        timelineScrollBar.setMaximum(300);
+        timelineScrollBar.setOrientation(javax.swing.JScrollBar.HORIZONTAL);
+        timelineScrollBar.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
-                jScrollBar1AdjustmentValueChanged(evt);
+                timelineScrollBarAdjustmentValueChanged(evt);
             }
         });
 
@@ -118,7 +118,7 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
                             .addComponent(jLabel1)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(cmboTimeType, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jScrollBar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(timelineScrollBar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(repInfoPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -133,7 +133,7 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlTimeline, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(timelineScrollBar, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -151,10 +151,10 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jScrollBar1AdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBar1AdjustmentValueChanged
-        int largestValue = jScrollBar1.getMaximum() - jScrollBar1.getVisibleAmount();
-        pnlTimeline.scrollWindow(jScrollBar1.getValue(), largestValue);
-    }//GEN-LAST:event_jScrollBar1AdjustmentValueChanged
+    private void timelineScrollBarAdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_timelineScrollBarAdjustmentValueChanged
+        int largestValue = timelineScrollBar.getMaximum() - timelineScrollBar.getVisibleAmount();
+        pnlTimeline.scrollWindow(timelineScrollBar.getValue(), largestValue);
+    }//GEN-LAST:event_timelineScrollBarAdjustmentValueChanged
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         pnlTimeline.changeTemporalWidth(+1);
@@ -166,6 +166,7 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
 
     private void cmboTimeTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmboTimeTypeActionPerformed
         pnlTimeline.setTimeType(cmboTimeType.getSelectedIndex());
+        timelineScrollBar.setValue(0);
     }//GEN-LAST:event_cmboTimeTypeActionPerformed
 
 
@@ -176,10 +177,10 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollBar jScrollBar1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private View.TimePanel pnlTimeline;
     private View.RepInfoPanel repInfoPanel;
+    private javax.swing.JScrollBar timelineScrollBar;
     // End of variables declaration//GEN-END:variables
 }
