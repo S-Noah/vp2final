@@ -37,7 +37,9 @@ public class RepNode extends RectBound{
     public String getName() {
         return name;
     }
-    
+    public boolean inDateRange(){
+        return false;
+    }
     public boolean InXRange(int x1, int x2){
         return (x + halfW >= x1 && x - halfW <= x2);
     }
@@ -45,7 +47,7 @@ public class RepNode extends RectBound{
         int quarterTextW = g.getFontMetrics().stringWidth(name) / 4;
         int newX = x - minX;
         g.setColor(color);
-        g.fillRect(newX, y, 50, 50);
+        g.fillOval(newX, y, w, h);
         g.setColor(Color.WHITE);
         g.drawString(name, newX + quarterW - quarterTextW, y - 5);
     }

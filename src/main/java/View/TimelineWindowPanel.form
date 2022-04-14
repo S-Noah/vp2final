@@ -36,7 +36,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="cmboTimeType" min="-2" pref="100" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="jScrollBar1" alignment="0" min="-2" pref="648" max="-2" attributes="0"/>
+                      <Component id="timelineScrollBar" alignment="0" min="-2" pref="648" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -56,7 +56,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="pnlTimeline" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollBar1" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="timelineScrollBar" min="-2" pref="22" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jTextField2" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -99,14 +99,14 @@
     </Component>
     <Component class="View.RepInfoPanel" name="repInfoPanel">
     </Component>
-    <Component class="javax.swing.JScrollBar" name="jScrollBar1">
+    <Component class="javax.swing.JScrollBar" name="timelineScrollBar">
       <Properties>
         <Property name="blockIncrement" type="int" value="1"/>
         <Property name="maximum" type="int" value="300"/>
         <Property name="orientation" type="int" value="0"/>
       </Properties>
       <Events>
-        <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="jScrollBar1AdjustmentValueChanged"/>
+        <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="timelineScrollBarAdjustmentValueChanged"/>
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="jTextField1">
