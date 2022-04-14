@@ -28,7 +28,7 @@ public class OldMainWin extends javax.swing.JFrame{
     }
     
     public void updateTimelineNodes(Rep[] reps){
-        pnlTimeline.setNodes(reps);
+        pnlTimeline.setRepNodes(reps);
     }
 
     /**

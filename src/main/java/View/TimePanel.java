@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package View;
 
 import Model.Rep;
@@ -10,119 +6,208 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import com.mycompany.vp2final.TimelineChangeHandler;
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
-/**
- *
- * @author Noahb
- */
 public class TimePanel extends javax.swing.JPanel {
+    // Static Fields.
+    private static final int barWidth = 20;
+    private static final int halfBarWidth = 10;
+    
+    public static enum TimeType{
+        DAYS, MONTHS, YEARS
+    }
+    
+    // Instance Fields.
     private User user;
-    private ArrayList<DayNode> days;
+    
+    // Node Fields.
+    private ArrayList<TemporalNode> temporalNodes;
     private ArrayList<RepNode> nodes;
     private ArrayList<RepNode> nodesInWindow;
     private ArrayList<TimelineChangeHandler> observers;
     
+    // DateRange Fields.
     private LocalDateTime minDate;
     private LocalDateTime maxDate;
-    private Duration dateRange;
+    private TimeType currentTimeType = TimeType.DAYS;
+    private int numDays;
+    private int numMonths;
+    private int numYears;
+    private int numNodes;
     
+    // Measurement Fields.
     private int w;
     private int h;
     private int halfW;
     private int halfH;
     
+    // Sliding Window Fields,
     private int zoom;
-    private int halfZoom;
-    
     private int maxX;
-    
     private int winMinX;
     private int winMaxX;
-    private int dayWidth;
+    private int temporalWidth;
+    private int numTemporalNodesInWin;
+    // Date Range Fields.
     
-    private boolean updated;
+    // Control Window Measurment Update and Initialization, Cannot be done in Constructor because the panel is not packed, instead, I set a flag for a function that will be called before it is painted.
+    private boolean initialized;
+    private boolean needsUpdate;
     
-    
-    /**
-     * Creates new form test
-     */
     public TimePanel() {
+        temporalNodes = new ArrayList();
         nodes = new ArrayList();
         nodesInWindow = new ArrayList();
-        days = new ArrayList();
         observers = new ArrayList();
-        //nodes.add(new RepNode(100, 200, 50, 50, "Visual II Final"));
-        //nodes.add(new RepNode(700, 200, 50, 50, "test rep2"));
-        updated = false;
-        dayWidth = 80;
+        
+        initialized = false;
+        needsUpdate = true;
+        temporalWidth = 80;
+        zoom = 100;
         maxDate = LocalDateTime.now();
-        setZoom(20);
+        
         initComponents();
     }
-    
+    // Observer implementation.
     public void informObservers(RepNode r){
         for(TimelineChangeHandler h : observers){
             h.onChange(r.getRep());
         }
     }
-    
     public void addObserver(TimelineChangeHandler handler){
         observers.add(handler);
     }
     
+    // Panel Updating Methods.
+    public void init(){
+        initialized = true;
+        numTemporalNodesInWin = w / temporalWidth;
+        winMinX = 0;
+        winMaxX = w;
+        setTemporalNodes();
+    }
+    public void updateDimensions(){
+        needsUpdate = false;
+        this.w = this.getWidth();
+        this.h = this.getHeight();
+        this.halfW = w/2;
+        this.halfH = h/2;
+        if(!initialized){
+            init();
+        }
+    }
     public void setUser(User user){
         this.user = user;
         minDate = this.user.getDateCreated();
-        dateRange = Duration.between(minDate, maxDate);
-        
-        maxX = (int)dateRange.toDays() * dayWidth;
-        System.out.println(maxX);
-        setNodes(user.getReps());
+        numDays = (int)ChronoUnit.DAYS.between(minDate, maxDate);
+        numMonths = (int)ChronoUnit.MONTHS.between(minDate, maxDate);
+        numYears = (int)ChronoUnit.YEARS.between(minDate, maxDate);
+        numNodes = numDays;
+        maxX = numNodes * temporalWidth;
+        System.out.println(minDate.toString() + "   -   " + maxDate.toString());
+        if(initialized){
+            setTemporalNodes();
+        }
+        setRepNodes(user.getReps());
         repaint();
     }
-    public void updateDays(){
-        for(DayNode day : days){
-            day.zoomUpdate(dayWidth);
+    public void setTemporalNodes(){
+        temporalNodes.clear();
+        StringBuilder sb = new StringBuilder();
+        if(currentTimeType == TimeType.MONTHS){
+            numNodes = numMonths;
+            for(int i = 0; i <= numNodes; i++){
+                LocalDateTime tempDate = minDate.plusMonths(i);
+                
+                sb.append(tempDate.getYear());
+                sb.append("/");
+                sb.append(tempDate.getMonthValue());
+                
+                if(i % 2 == 1){
+                    temporalNodes.add(new TemporalNode(sb.toString(), i, true, (i + 1) * temporalWidth, halfH - 2 + halfBarWidth, 4, 4));
+                }
+                else{
+                    temporalNodes.add(new TemporalNode(sb.toString(), i, false, (i + 1) * temporalWidth, halfH - 2 - halfBarWidth, 4, 4));
+                }
+                
+                sb.setLength(0);
+            }
+        }
+        else if(currentTimeType == TimeType.YEARS){
+            numNodes = numYears;
+            for(int i = 0; i <= numNodes + 1; i++){
+                LocalDateTime tempDate = minDate.plusYears(i);
+                
+                sb.append(tempDate.getYear());
+                
+                if(i % 2 == 1){
+                    temporalNodes.add(new TemporalNode(sb.toString(), i, true, (i + 1) * temporalWidth, halfH - 2 + halfBarWidth, 4, 4));
+                }
+                else{
+                    temporalNodes.add(new TemporalNode(sb.toString(), i, false, (i + 1) * temporalWidth, halfH - 2 - halfBarWidth, 4, 4));
+                }
+                
+                sb.setLength(0);
+            }
+        }
+        else{
+            numNodes = numDays;
+            for(int i = 0; i <= numNodes; i++){
+                LocalDateTime tempDate = minDate.plusDays(i);
+                
+                sb.append(tempDate.getYear());
+                sb.append("/");
+                sb.append(tempDate.getMonthValue());
+                sb.append("/");
+                sb.append(tempDate.getDayOfMonth());
+                
+                if(i % 2 == 1){
+                    temporalNodes.add(new TemporalNode(sb.toString(), i, true, (i + 1) * temporalWidth, halfH - 2 + halfBarWidth, 4, 4));
+                }
+                else{
+                    temporalNodes.add(new TemporalNode(sb.toString(), i, false, (i + 1) * temporalWidth, halfH - 2 - halfBarWidth, 4, 4));
+                }
+                
+                sb.setLength(0);
+            }
+        }
+        maxX = numNodes * temporalWidth;
+    }
+    public void updateTemporalNodes(){
+        for(TemporalNode node : temporalNodes){
+            node.zoomUpdate(temporalWidth);
         }
     }
-    public void setNodes(Rep[] reps){
+    public void setRepNodes(Rep[] reps){
         nodes.clear();
         for(int i = 0; i < reps.length; i++){
             nodes.add(new RepNode(reps[i], (i + 1) * 200, 200, 50, 50));
         }
         int lastIndex = nodes.size() - 1;
-        //maxX = nodes.get(lastIndex).getX() + (nodes.get(lastIndex).getW() * 2);
     }
-    
-    public void setZoom(int val){
-        zoom = val;
-        halfZoom = zoom / 2;
-    }
-    
-    public void changeZoom(int mod){
-        //zoom += 10 * mod;
-        dayWidth += 10 * mod;
-        maxX = (int)dateRange.toDays() * dayWidth;
-        //halfZoom = zoom / 2;
-        updateDays();
+    // Panel Control Methods.
+    public void setTimeType(int i){
+        if(i == 1){
+            currentTimeType = TimeType.MONTHS;
+        }
+        else if(i == 2){
+            currentTimeType = TimeType.YEARS;
+        }
+        else{
+            currentTimeType = TimeType.DAYS;
+        }
+        setTemporalNodes();
         repaint();
     }
-    public void changeWindow(int val){
-        if(val > 0){
-            if(winMaxX < maxX){
-                winMinX += val;
-                winMaxX += val;
-                repaint();
-            }
-        }
-        else if(winMinX + val > 0){
-            winMinX += val;
-            winMaxX += val;
-            repaint();
-        }
+    public void changeTemporalWidth(int mod){
+        temporalWidth += 10 * mod;
+        numTemporalNodesInWin = w / temporalWidth;
+        maxX = numNodes * temporalWidth;
+        
+        updateTemporalNodes();
+        repaint();
     }
     public void scrollWindow(int val, int maxScroll){
         int scrollRatio = maxX / maxScroll;
@@ -130,44 +215,23 @@ public class TimePanel extends javax.swing.JPanel {
         winMaxX = w + winMinX;
         repaint();
     }
-       
-    public void updateDimesions(){
-        this.w = this.getWidth();
-        this.h = this.getHeight();
-        this.halfW = w/2;
-        this.halfH = h/2;
-        if(!updated){
-            if(dateRange != null){
-                for(int i = 0; i < dateRange.toDays(); i++){
-                    days.add(new DayNode(i, i * dayWidth, halfH - halfZoom - 2, 4, 4));
-                }   
-            }
-            winMinX = 0;
-            winMaxX = w;
-            updated = true;
-        }
-    }
     
+    // Painting Methods.
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        updateDimesions();
-        
-        //System.out.println(winMinX + "-" + winMaxX);
-        //g.fillRect(winMinX, halfH-25, 10, 50);
-        //g.fillRect(winMaxX - 10, halfH-25, 10, 50);
+        if(needsUpdate){
+            updateDimensions();
+        }
         
         Color temp = g.getColor();
         
         g.setColor(Color.BLACK);
-        
-        g.fillRect(0, halfH - halfZoom, w, zoom);
-        g.setColor(Color.WHITE);
-        if(dateRange != null){
-            for(DayNode day : days){
-                if(day.InXRange(winMinX, winMaxX)){
-                    day.draw(g, winMinX);
-                }
+        g.fillRect(0, halfH - halfBarWidth, w, barWidth);
+       
+        for(TemporalNode node : temporalNodes){
+            if(node.InXRange(winMinX, winMaxX)){
+                node.draw(g, winMinX);
             }
         }
         /*
