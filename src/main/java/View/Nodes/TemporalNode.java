@@ -2,11 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package View;
+package View.Nodes;
 
+import View.TimePanel;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  *
@@ -14,36 +16,33 @@ import java.time.LocalDateTime;
  */
 public class TemporalNode extends RectBound{
     private static StringBuilder sb = new StringBuilder();
-    
-    private int halfW, halfH, quarterW;
+    private static int diam = 4;
+    private static int halfDiam = 2;
+   
     private int i;
     private boolean isBottomNode;
     private String name;
-    private LocalDateTime date;
-    private TimePanel.TimeType timeType;
+    private LocalDate date;
+    private TimePanel.Mode mode;
     
     
-    public TemporalNode(int i, int y, int diam, int space, boolean isBottomNode, LocalDateTime minDate, TimePanel.TimeType timeType){
+    public TemporalNode(int i, int y, int space, boolean isBottomNode, LocalDate minDate, TimePanel.Mode mode){
         super((i + 1) * space, y, diam, diam);
         
         this.i = i;
         this.isBottomNode = isBottomNode;
-        this.timeType = timeType;
+        this.mode = mode;
         
-        halfW = w/2;
-        halfH = h/2;
-        quarterW = halfW/2;
-        
-        this.y -= halfH;
+        this.y -= halfDiam;
         
         sb.setLength(0);
-        if(timeType == TimePanel.TimeType.MONTHS){
+        if(mode == TimePanel.Mode.MONTHS){
             this.date = minDate.plusMonths(i);
             sb.append(date.getYear());
             sb.append("/");
             sb.append(date.getMonthValue());
         }
-        else if(timeType == TimePanel.TimeType.YEARS){
+        else if(mode == TimePanel.Mode.YEARS){
             this.date = minDate.plusYears(i);
             sb.append(date.getYear());
         }
@@ -57,26 +56,40 @@ public class TemporalNode extends RectBound{
         }
         this.name = sb.toString();
     }
-    public LocalDateTime getDate(){
+    public LocalDate getDate(){
         return date;
     }
     public void zoomUpdate(int space){
         this.x = (i + 1) * space;
     }
     public boolean InXRange(int x1, int x2){
-        return (x + halfW >= x1 && x - halfW <= x2);
+        return (x + halfDiam >= x1 && x - halfDiam <= x2);
     }
-    public void draw(Graphics g, int minX){
-        int quarterTextW = g.getFontMetrics().stringWidth(name) / 4;
-        int newX = x - minX;
+    public void draw(Graphics g, int minX, int tickH){
+        g.setFont(new Font("Courier", Font.PLAIN, 14)); 
+        int textW = g.getFontMetrics().stringWidth(name);
+        int textH = g.getFontMetrics().getHeight();
+        int halfTextW = textW / 2;
+        int halfTextH = textH / 2;
+        int newX = x - minX - halfDiam;
+
+        //g.setColor(Color.DARK_GRAY);
         g.setColor(Color.WHITE);
-        g.fillOval(newX, y, w, h);
+        g.fillRect(newX + 1, y + halfDiam, 2, tickH);
+        
         g.setColor(Color.BLACK);
+        g.fillOval(newX, y, w, h);
+        g.fillOval(newX, y + tickH, w, h);
+        
+        g.setColor(Color.WHITE);
         if(isBottomNode){ 
-            g.drawString(name, newX + quarterW - quarterTextW, y + 15);
+            g.drawString(name, newX - halfTextW, y + tickH + textH);
         }
         else{
-            g.drawString(name, newX + quarterW - quarterTextW, y - 5);
+           g.drawString(name, newX - halfTextW, y - halfTextH);
         }
+        
+        //g.setColor(Color.WHITE);
+        //
     }
 }

@@ -2,6 +2,7 @@ package Model;
 
 import Github.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -35,7 +36,7 @@ public class User extends UserRequest implements Serializable{
     
     private Rep[] reps;
     private Rep timelineRep;
-    private LocalDateTime dateCreated;
+    private LocalDate dateCreated;
     
     private boolean hasMediaRep;
     
@@ -45,7 +46,7 @@ public class User extends UserRequest implements Serializable{
         
         timelineRep = Rep.CreateRepInst(login, "TimelineMedia");
         hasMediaRep = (timelineRep != null);
-        dateCreated = LocalDateTime.parse(created_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        dateCreated = LocalDateTime.parse(created_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDate();
         if(hasMediaRep){
             timelineRep.fillContents();
         }
@@ -75,7 +76,7 @@ public class User extends UserRequest implements Serializable{
         }
     }
 
-    public LocalDateTime getDateCreated() {
+    public LocalDate getDateCreated() {
         return dateCreated;
     }
     

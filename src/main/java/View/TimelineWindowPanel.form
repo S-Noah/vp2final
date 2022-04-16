@@ -102,8 +102,9 @@
     <Component class="javax.swing.JScrollBar" name="timelineScrollBar">
       <Properties>
         <Property name="blockIncrement" type="int" value="1"/>
-        <Property name="maximum" type="int" value="300"/>
+        <Property name="maximum" type="int" value="500"/>
         <Property name="orientation" type="int" value="0"/>
+        <Property name="visibleAmount" type="int" value="50"/>
       </Properties>
       <Events>
         <EventHandler event="adjustmentValueChanged" listener="java.awt.event.AdjustmentListener" parameters="java.awt.event.AdjustmentEvent" handler="timelineScrollBarAdjustmentValueChanged"/>

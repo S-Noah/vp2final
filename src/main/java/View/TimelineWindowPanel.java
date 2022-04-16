@@ -25,10 +25,6 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
         pnlTimeline.setUser(user);
         githubUserInfoPanel1.setUser(user);
     }
-    public void updateTimelineNodes(Rep[] reps){
-        pnlTimeline.setRepNodes(reps);
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -62,8 +58,9 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
         );
 
         timelineScrollBar.setBlockIncrement(1);
-        timelineScrollBar.setMaximum(300);
+        timelineScrollBar.setMaximum(500);
         timelineScrollBar.setOrientation(javax.swing.JScrollBar.HORIZONTAL);
+        timelineScrollBar.setVisibleAmount(50);
         timelineScrollBar.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
                 timelineScrollBarAdjustmentValueChanged(evt);

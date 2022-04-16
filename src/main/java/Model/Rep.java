@@ -8,6 +8,7 @@ import Github.API;
 import Github.FileRequest;
 import Github.RepRequest;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -40,8 +41,8 @@ public class Rep extends RepRequest implements Serializable{
     //private FileRequest contents[];
     private Folder contents;
     private DefaultMutableTreeNode root;
-    private LocalDateTime dateCreated;
-    private LocalDateTime dateLastPushed;
+    private LocalDate dateCreated;
+    private LocalDate dateLastPushed;
     
     public static void print(FileRequest frs[]){
         for(FileRequest fr : frs){
@@ -52,8 +53,8 @@ public class Rep extends RepRequest implements Serializable{
     public Rep(RepRequest repRequest){
         this.copy(repRequest);
         contents = new Folder();
-        dateCreated = LocalDateTime.parse(created_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        dateLastPushed = LocalDateTime.parse(pushed_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        dateCreated = LocalDateTime.parse(created_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDate();
+        dateLastPushed = LocalDateTime.parse(pushed_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDate();
         
         /*
         FileRequest repFileRequests[] = API.getInstance().getContents(owner.getLogin(), name, "");
@@ -65,6 +66,15 @@ public class Rep extends RepRequest implements Serializable{
         */
        
     }
+
+    public LocalDate getDateCreated() {
+        return dateCreated;
+    }
+
+    public LocalDate getDateLastPushed() {
+        return dateLastPushed;
+    }
+    
     public Folder getContents(){
         return contents;
     }
