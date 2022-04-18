@@ -1,8 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package View.Nodes;
+package View.JGraphics;
 
 import View.TimePanel;
 import java.awt.Color;
@@ -10,20 +6,16 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.time.LocalDate;
 
-/**
- *
- * @author NoahS
- */
-public class TemporalNode extends RectBound{
+public class TemporalNode extends RectBound implements Drawable{
     private static StringBuilder sb = new StringBuilder();
     private static int diam = 4;
     private static int halfDiam = 2;
    
+    private LocalDate date;
+    private TimePanel.Mode mode;
     private int i;
     private boolean isBottomNode;
     private String name;
-    private LocalDate date;
-    private TimePanel.Mode mode;
     
     
     public TemporalNode(int i, int y, int space, boolean isBottomNode, LocalDate minDate, TimePanel.Mode mode){
@@ -88,8 +80,5 @@ public class TemporalNode extends RectBound{
         else{
            g.drawString(name, newX - halfTextW, y - halfTextH);
         }
-        
-        //g.setColor(Color.WHITE);
-        //
     }
 }

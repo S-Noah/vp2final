@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package View.Nodes;
+package View.JGraphics;
 
-/**
- *
- * @author NoahS
- */
 abstract public class RectBound {
     protected int x;
     protected int y;
@@ -16,16 +8,10 @@ abstract public class RectBound {
     protected int h;
     
     protected RectBound(){
-        this.x = 0;
-        this.y = 0;
-        this.w = 0;
-        this.h = 0;
+        this(0, 0, 0, 0);
     }
     protected RectBound(int w, int h){
-        this.x = 0;
-        this.y = 0;
-        this.w = w;
-        this.h = h;
+        this(0, 0, w, h);
     }
     
     protected RectBound(int x, int y, int w, int h){

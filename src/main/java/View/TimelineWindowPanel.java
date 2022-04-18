@@ -23,7 +23,9 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
     public void setUser(User user){
         //updateTimelineNodes(user.getReps());
         pnlTimeline.setUser(user);
+        timelineScrollBar.setValue(0);
         githubUserInfoPanel1.setUser(user);
+        
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -58,9 +60,14 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
         );
 
         timelineScrollBar.setBlockIncrement(1);
-        timelineScrollBar.setMaximum(500);
+        timelineScrollBar.setMaximum(2500);
         timelineScrollBar.setOrientation(javax.swing.JScrollBar.HORIZONTAL);
-        timelineScrollBar.setVisibleAmount(50);
+        timelineScrollBar.setVisibleAmount(250);
+        timelineScrollBar.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                timelineScrollBarMouseWheelMoved(evt);
+            }
+        });
         timelineScrollBar.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
                 timelineScrollBarAdjustmentValueChanged(evt);
@@ -165,6 +172,11 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
         pnlTimeline.setTimeType(cmboTimeType.getSelectedIndex());
         timelineScrollBar.setValue(0);
     }//GEN-LAST:event_cmboTimeTypeActionPerformed
+
+    private void timelineScrollBarMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_timelineScrollBarMouseWheelMoved
+       int clicks = evt.getWheelRotation();
+       timelineScrollBar.setValue(timelineScrollBar.getValue() - clicks);
+    }//GEN-LAST:event_timelineScrollBarMouseWheelMoved
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

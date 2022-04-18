@@ -1,7 +1,7 @@
 package View;
 
-import View.Nodes.RepNode;
-import View.Nodes.TemporalNode;
+import View.JGraphics.RepNode;
+import View.JGraphics.TemporalNode;
 import Model.Rep;
 import Model.User;
 import java.awt.Color;
@@ -9,15 +9,12 @@ import java.awt.Graphics;
 
 import com.mycompany.vp2final.TimelineChangeHandler;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import View.JGraphics.Drawable;
 
 public class TimePanel extends javax.swing.JPanel {
     // Static Fields.
-    private static final int barHeight = 24;
-    private static final int halfBarHeight = barHeight / 2;
-    
     public static class Mode{
         public static Mode DAYS = new Mode(1);
         public static Mode MONTHS = new Mode(2);
@@ -48,22 +45,16 @@ public class TimePanel extends javax.swing.JPanel {
     
     // Node Fields.
     private ArrayList<TemporalNode> temporalNodes;
-    private ArrayList<TemporalNode> temporalNodesInWindow;
     private ArrayList<RepNode> repNodes;
-    private ArrayList<RepNode> repNodesInWindow;
+    private ArrayList<Drawable> nodesToDraw;
     private ArrayList<TimelineChangeHandler> observers;
     
     // DateRange Fields.
     private LocalDate minDate;
     private LocalDate maxDate;
-    //private TimeType currentTimeType = TimeType.DAYS;
     private Mode currentMode;
-    //private int numDays; // Flagged for update.
-    //private int numMonths;// Flagged for update.
-    //private int numYears; // Flagged for update.
-    //private int numNodes; // Flagged for update.
     
-    // Measurement Fields.
+    // Window Measurement Fields.
     private int w;
     private int h;
     private int halfW;
@@ -74,32 +65,38 @@ public class TimePanel extends javax.swing.JPanel {
     private int maxX;
     private int winMinX;
     private int winMaxX;
-    private int temporalWidth; // Flagged for update.
-    //private int numTemporalNodesInWin;
+    private int temporalWidth;
     private LocalDate winMinDate;
     private LocalDate winMaxDate;
     
+    // Bar Fields.
+    private int barY;
+    private int barHeight;
+    private int halfBarHeight;
     // Control Window Measurment Update and Initialization, Cannot be done in Constructor because the panel is not packed, instead, I set a flag for a function that will be called before it is painted.
     private boolean initialized;
-    private boolean needsUpdate;
+    private boolean needsDimensionUpdate;
     
     public TimePanel() {
+        initialized = false;
+        needsDimensionUpdate = false;
+        
+        currentMode = Mode.DAYS;
+        temporalWidth = 50;
+        zoom = 100;
+        barHeight = 20;
+        halfBarHeight = barHeight / 2;
+        
         temporalNodes = new ArrayList();
-        temporalNodesInWindow = new ArrayList();
         repNodes = new ArrayList();
-        repNodesInWindow = new ArrayList();
+        nodesToDraw = new ArrayList();
         observers = new ArrayList();
         
         maxDate = LocalDate.now();
         
-        initialized = false;
-        needsUpdate = false;
-        temporalWidth = 50;
-        zoom = 100;
-        currentMode = Mode.DAYS;
         
         initComponents();
-    }
+    } 
     // Observer implementation.
     public void informObservers(RepNode r){
         for(TimelineChangeHandler h : observers){
@@ -120,11 +117,12 @@ public class TimePanel extends javax.swing.JPanel {
         findNodesInRange();
     }
     public void updateDimensions(){
-        needsUpdate = false;
+        needsDimensionUpdate = false;
         this.w = this.getWidth();
         this.h = this.getHeight();
         this.halfW = w/2;
         this.halfH = h/2;
+        this.barY = (this.h - (barHeight * 3)) - halfBarHeight;
         if(!initialized){
             init();
         }
@@ -132,23 +130,26 @@ public class TimePanel extends javax.swing.JPanel {
     public void setUser(User user){
         this.user = user;
         this.minDate = this.user.getDateCreated();
-        Mode.DAYS.setNumNodes((int)ChronoUnit.DAYS.between(minDate, maxDate));
-        Mode.MONTHS.setNumNodes((int)ChronoUnit.MONTHS.between(minDate, maxDate));
-        Mode.YEARS.setNumNodes((int)ChronoUnit.YEARS.between(minDate, maxDate));
+        Mode.DAYS.setNumNodes((int)ChronoUnit.DAYS.between(minDate, maxDate.plusDays(1)));
+        Mode.MONTHS.setNumNodes((int)ChronoUnit.MONTHS.between(minDate, maxDate.plusMonths(1)));
+        Mode.YEARS.setNumNodes((int)ChronoUnit.YEARS.between(minDate, maxDate.plusYears(1)));
         
         if(initialized){
+            winMinX = 0;
+            winMaxX = w;
             setTemporalNodes();
+            setRepNodes();
             findNodesInRange();
             repaint();
         }
         else{
-            needsUpdate = true;
+            needsDimensionUpdate = true;
         }
     }
     public void setTemporalNodes(){
         temporalNodes.clear();
-        for(int i = 0; i <= currentMode.getNumNodes() + 1; i++){
-            temporalNodes.add(new TemporalNode(i, halfH - halfBarHeight, temporalWidth, i % 2 == 1, minDate, currentMode));
+        for(int i = 0; i <= currentMode.getNumNodes(); i++){
+            temporalNodes.add(new TemporalNode(i, barY, temporalWidth, i % 2 == 1, minDate, currentMode));
         }
         
         maxX = (currentMode.getNumNodes() * temporalWidth) + temporalWidth;
@@ -156,29 +157,38 @@ public class TimePanel extends javax.swing.JPanel {
     public void setRepNodes(){
         repNodes.clear();
         for(Rep r : user.getReps()){
-            repNodes.add(new RepNode(r, temporalWidth, minDate, currentMode, halfH - halfBarHeight));
+            repNodes.add(new RepNode(r, minDate, currentMode, barY, temporalWidth));
         }
     }
-    public void updateTemporalNodes(){
+    public void updateNodes(){
         for(TemporalNode node : temporalNodes){
+            node.zoomUpdate(temporalWidth);
+        }
+        for(RepNode node : repNodes){
             node.zoomUpdate(temporalWidth);
         }
     }
     public void findNodesInRange(){
-        temporalNodesInWindow.clear();
+        nodesToDraw.clear();
         for(TemporalNode node : temporalNodes){
-            if(node.InXRange(winMinX, winMaxX - temporalWidth)){
-                temporalNodesInWindow.add(node);
+            if(node.InXRange(winMinX, winMaxX)){
+                nodesToDraw.add(node);
             }
         }
-        winMinDate = temporalNodesInWindow.get(0).getDate();
-        winMaxDate = temporalNodesInWindow.get(temporalNodesInWindow.size() -1).getDate();
+        int i = 2;
+        for(RepNode node: repNodes){
+            if(node.InXRange(winMinX, winMaxX)){
+                if(!node.isSingleDate()){
+                    i++;
+                }
+                node.setI(i);
+                nodesToDraw.add(node);
+            }
+        }
     }
     
     // Panel Control Methods.
     public void setTimeType(int i){
-        winMinX = 0;
-        winMaxX = w;
         if(i == 1){
             currentMode = Mode.MONTHS;
         }
@@ -188,6 +198,8 @@ public class TimePanel extends javax.swing.JPanel {
         else{
             currentMode = Mode.DAYS;
         }
+        winMinX = 0;
+        winMaxX = w;
         setTemporalNodes();
         findNodesInRange();
         repaint();
@@ -196,8 +208,8 @@ public class TimePanel extends javax.swing.JPanel {
         int newTemporalWidth = temporalWidth + 10 * mod;
         if(newTemporalWidth > 40 && newTemporalWidth < 150){
             temporalWidth = newTemporalWidth;
-            maxX = (currentMode.getNumNodes() * temporalWidth) + temporalWidth;
-            updateTemporalNodes();
+            maxX = (currentMode.getNumNodes() * temporalWidth);
+            updateNodes();
             findNodesInRange();
             repaint();
         }
@@ -214,29 +226,17 @@ public class TimePanel extends javax.swing.JPanel {
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        if(needsUpdate){
+        if(needsDimensionUpdate){
             updateDimensions();
         }
         
         Color temp = g.getColor();
         g.setColor(Color.BLACK);
-        //g.setColor(Color.getHSBColor(0, 0, 0.55f));
-        g.fillRect(0, halfH - halfBarHeight, w, barHeight);
+        //g.fillRect(0, halfH - halfBarHeight, w, barHeight);
+        g.fillRect(0, barY, w, barHeight);
         
-        for(TemporalNode node : temporalNodesInWindow){
-            if(node.InXRange(winMinX, winMaxX - temporalWidth)){
-                node.draw(g, winMinX, barHeight);
-            }
-        }
-        
-        //System.out.println(currentMode.getNumNodes());
-        
-        repNodesInWindow.clear();
-        for(RepNode node : repNodes){
-            //if(node.InXRange(winMinX, winMaxX)){
-                repNodesInWindow.add(node);
-                node.draw(g, winMinX);
-            //}
+        for(Drawable node : nodesToDraw){
+            node.draw(g, winMinX, barHeight);
         }
        
         g.setColor(temp);
@@ -279,7 +279,7 @@ public class TimePanel extends javax.swing.JPanel {
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
         int mouseX = evt.getX() + winMinX;
         int mouseY = evt.getY();
-        for(RepNode node : repNodesInWindow){
+        for(RepNode node : repNodes){
             if(node.touchingMouse(mouseX, mouseY)){
                 informObservers(node);
                 break;

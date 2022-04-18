@@ -36,7 +36,10 @@ public class RepRequest implements Serializable{
     protected int subscribers;
     protected String created_at;
     protected String pushed_at;
-
+    
+    public String getCreated_at() {
+        return created_at;
+    }
     public String getPushed_at() {
         return pushed_at;
     }
@@ -53,10 +56,6 @@ public class RepRequest implements Serializable{
         return owner;
     }
 
-    public String getCreated_at() {
-        return created_at;
-    }
-    
     public String getName(){
         return name;
     }

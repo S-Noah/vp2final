@@ -58,7 +58,7 @@ public class APIClient {
     
     public static Response fire(Request request) throws IOException{
         Response response = client.newCall(request).execute();
-        System.out.println(response.toString());
+        //System.out.println(response.toString());
         return response;
     }
     

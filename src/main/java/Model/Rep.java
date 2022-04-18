@@ -11,22 +11,25 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import javax.swing.tree.DefaultMutableTreeNode;
  
 /**
  *
  * @author NoahS
  */
-public class Rep extends RepRequest implements Serializable{
+public class Rep extends RepRequest implements Serializable, Comparable<Rep>{
     public static Rep[] CreateRepInsts(String userRepsUrl){
         RepRequest requests[] = API.getInstance().getReps(userRepsUrl);
-        Rep reps[] = new Rep[requests.length];
-        int i = 0;
+        ArrayList<Rep> validReps = new ArrayList();
         for(RepRequest rr : requests){
-            reps[i] = new Rep(rr);
-            i++;
+            if(!rr.isFork() && rr.getName() != "TimelineMedia"){
+                validReps.add(new Rep(rr));
+            }
         }
-        return reps;
+        Collections.sort(validReps);
+        return validReps.toArray(new Rep[validReps.size()]);
     }
     
     public static Rep CreateRepInst(String login, String repName){
@@ -109,5 +112,9 @@ public class Rep extends RepRequest implements Serializable{
     @Override
     public String toString(){
         return name;
+    }
+    @Override
+    public int compareTo(Rep rep){
+        return this.dateCreated.compareTo(rep.getDateCreated()) * -1;
     }
 }
