@@ -58,6 +58,7 @@ public class TimePoint extends RectBound implements Drawable{
     }
     
     public void draw(Graphics g, int minX, int barHeight){
+        
         int newX = x - minX;
         g.setColor(color);
         g.fillOval(newX, y, w, h);
@@ -69,6 +70,18 @@ public class TimePoint extends RectBound implements Drawable{
 
     public LocalDate getDate() {
         return date;
+    }
+
+    public int getNumDays() {
+        return numDays;
+    }
+
+    public int getNumMonths() {
+        return numMonths;
+    }
+
+    public int getNumYears() {
+        return numYears;
     }
     
 }

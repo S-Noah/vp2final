@@ -1,11 +1,16 @@
 package Model;
 
 import Github.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class User extends UserRequest implements Serializable{
     private static User mainUser;
@@ -50,6 +55,11 @@ public class User extends UserRequest implements Serializable{
         if(hasMediaRep){
             timelineRep.fillContents();
         }
+        else{
+            //createTimelineMediaRep();
+            //timelineRep = Rep.CreateRepInst(login, "TimelineMedia");
+            //fillTimelineMediaRep();
+        }
         
         //timelineRep.getContents().output("");
     }
@@ -71,8 +81,20 @@ public class User extends UserRequest implements Serializable{
         API.getInstance().createRep("TimelineMedia");
     }
     public void fillTimelineMediaRep(){
-        for(Rep r : reps){
-            API.getInstance().addFile(login, timelineRep.getName(), r.getName()+ "/desc.txt", "Folder init for " + r.getName(), Base64.getEncoder().encodeToString("This was made to store media".getBytes()));
+        try {
+            FileInputStream imageStream = new FileInputStream(Rep.baseImage);
+            byte[] imageBytes = imageStream.readAllBytes();
+            for(Rep r : reps){
+                if(r.getName() != "TimelineMedia"){
+                    API.getInstance().addFile(login, timelineRep.getName(), r.getName()+ "/" + r.baseImage.getName(), "Folder init for " + r.getName(), Base64.getEncoder().encodeToString(imageBytes));
+                }
+            }
+        } 
+        catch (FileNotFoundException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (IOException ex) {
+           Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

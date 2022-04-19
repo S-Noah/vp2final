@@ -7,6 +7,8 @@ package Model;
 import Github.API;
 import Github.FileRequest;
 import Github.RepRequest;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,11 +22,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author NoahS
  */
 public class Rep extends RepRequest implements Serializable, Comparable<Rep>{
+    public static File baseImage = new File("logo.png");
+    
     public static Rep[] CreateRepInsts(String userRepsUrl){
         RepRequest requests[] = API.getInstance().getReps(userRepsUrl);
         ArrayList<Rep> validReps = new ArrayList();
         for(RepRequest rr : requests){
-            if(!rr.isFork() && rr.getName() != "TimelineMedia"){
+            if((!rr.isFork()) && !rr.getName().equals("TimelineMedia")){
                 validReps.add(new Rep(rr));
             }
         }
@@ -67,7 +71,15 @@ public class Rep extends RepRequest implements Serializable, Comparable<Rep>{
         root = new DefaultMutableTreeNode(name);
         makeTree(contents, root);
         */
-       
+    }
+    
+    public void initFolders(){
+        FileRequest repFileRequests[] = API.getInstance().getContents(owner.getLogin(), name, "");
+        contents.addFileRequests(repFileRequests);
+        fillContents(contents);
+        
+        root = new DefaultMutableTreeNode(name);
+        makeTree(contents, root);
     }
 
     public LocalDate getDateCreated() {
@@ -86,6 +98,9 @@ public class Rep extends RepRequest implements Serializable, Comparable<Rep>{
     }
     public void fillContents(){
         FileRequest repFileRequests[] = API.getInstance().getContents(owner.getLogin(), name, "");
+//        for(FileRequest fr : repFileRequests){
+//            System.out.println(fr);
+//        }
         contents.addFileRequests(repFileRequests);
         fillContents(contents);
         
@@ -105,7 +120,7 @@ public class Rep extends RepRequest implements Serializable, Comparable<Rep>{
             root.add(fNode);
             makeTree(f, fNode);
         }
-        for(File f : folder.getFileValues()){
+        for(GFile f : folder.getFileValues()){
             root.add(new DefaultMutableTreeNode(f.getName()));
         }
     }

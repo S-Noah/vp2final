@@ -18,7 +18,7 @@ import javax.swing.tree.TreePath;
  */
 public class Folder extends FileRequest{
     private HashMap<String, Folder> folders;
-    private HashMap<String, File> files;
+    private HashMap<String, GFile> files;
     private boolean isRoot;
     private DefaultMutableTreeNode root;
     
@@ -45,11 +45,11 @@ public class Folder extends FileRequest{
             folders.put(fr.getName(), new Folder(fr));
         }
         else{
-            files.put(fr.getName(), new File(fr));
+            files.put(fr.getName(), new GFile(fr));
         }
     }
     public void output(String indent){
-        for(File f : files.values()){
+        for(GFile f : files.values()){
             System.out.println(indent + f.getName());
         }
         for(Folder f : folders.values()){
@@ -66,20 +66,20 @@ public class Folder extends FileRequest{
         folders.put(key, new Folder(fr));
     }
     public void addFile(String key, FileRequest fr){
-        files.put(key, new File(fr));
+        files.put(key, new GFile(fr));
     }
     
     public Folder getSubfolder(String key){
         return folders.get(key);
     }
-    public File getFile(String key){
+    public GFile getFile(String key){
         return files.get(key);
     }
     
     public Set<String> getFileKeys(){
         return files.keySet();
     }
-    public Collection<File> getFileValues(){
+    public Collection<GFile> getFileValues(){
         return files.values();
     }
     
@@ -91,7 +91,7 @@ public class Folder extends FileRequest{
     } 
     public FileRequest follow(TreePath path){
         Folder folder = this;
-        File file;
+        GFile file;
         for(Object dir : path.getPath()){
             if(dir.toString().contains(".")){
                 file = folder.getFile(dir.toString());
@@ -108,7 +108,7 @@ public class Folder extends FileRequest{
             node.add(nextNode);
             makeTree(f, nextNode);
         }
-        for(File f : folder.getFileValues()){
+        for(GFile f : folder.getFileValues()){
             node.add(new DefaultMutableTreeNode(f.getName()));
         }
     }

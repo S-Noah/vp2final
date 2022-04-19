@@ -7,7 +7,16 @@ package View;
 import Model.Folder;
 import Model.Rep;
 import Model.User;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -20,6 +29,7 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
     /**
      * Creates new form RepMediaManagerPanel
      */
+    private JFileChooser fc;
     private DefaultListModel<String> dlm;
     private DefaultTreeModel dtm;
     private DefaultMutableTreeNode root;
@@ -29,6 +39,7 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
         dlm = new DefaultListModel<>();
         root = new DefaultMutableTreeNode("");
         dtm = new DefaultTreeModel(root);
+        fc = new JFileChooser();
         initComponents();
     }
     
@@ -57,6 +68,18 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
             root = f.getTree();
             dtm = new DefaultTreeModel(root);
             treeMedia.setModel(dtm);
+            try{
+                String logoUrl = f.getFile("logo.png").getDownload_url();
+                BufferedImage img = ImageIO.read(new URL(logoUrl));
+                ImageIcon icon = new ImageIcon(img.getScaledInstance(lblPicture.getWidth(), lblPicture.getHeight(), Image.SCALE_SMOOTH));
+                lblPicture.setIcon(icon);
+            }  
+            catch(MalformedURLException e){
+                e.printStackTrace();
+            }   
+            catch(IOException e){
+                e.printStackTrace();
+            }
         }
         
         /*
@@ -82,6 +105,9 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
         lstRep = new javax.swing.JList<>();
         jScrollPane2 = new javax.swing.JScrollPane();
         treeMedia = new javax.swing.JTree();
+        jButton1 = new javax.swing.JButton();
+        lblPicture = new javax.swing.JLabel();
+        btnChangePhoto = new javax.swing.JButton();
 
         lstRep.setModel(dlm);
         lstRep.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -99,6 +125,15 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
         });
         jScrollPane2.setViewportView(treeMedia);
 
+        jButton1.setText("Save");
+
+        btnChangePhoto.setText("Change Photo");
+        btnChangePhoto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChangePhotoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -108,16 +143,31 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(590, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnChangePhoto)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1))
+                    .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(28, 28, 28)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(54, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnChangePhoto)
+                            .addComponent(jButton1))))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -137,10 +187,33 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
         */
     }//GEN-LAST:event_treeMediaValueChanged
 
+    private void btnChangePhotoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePhotoActionPerformed
+        int ret = fc.showOpenDialog(null);
+        if(ret == JFileChooser.APPROVE_OPTION){
+            File file = fc.getSelectedFile();
+            if(file != null){
+                try{
+                    BufferedImage img = ImageIO.read(file);
+                    ImageIcon icon = new ImageIcon(img.getScaledInstance(lblPicture.getWidth(), lblPicture.getHeight(), Image.SCALE_SMOOTH));
+                    lblPicture.setIcon(icon);
+                }  
+                catch(MalformedURLException e){
+                    e.printStackTrace();
+                }   
+                catch(IOException e){
+                    e.printStackTrace();
+                }
+            }  
+        }
+    }//GEN-LAST:event_btnChangePhotoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnChangePhoto;
+    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblPicture;
     private javax.swing.JList<String> lstRep;
     private javax.swing.JTree treeMedia;
     // End of variables declaration//GEN-END:variables

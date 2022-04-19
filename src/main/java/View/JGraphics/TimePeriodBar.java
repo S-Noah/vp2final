@@ -4,6 +4,7 @@
  */
 package View.JGraphics;
 
+import View.TimePanel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -22,11 +23,13 @@ public class TimePeriodBar extends RectBound{
     private TimePoint start;
     private TimePoint end;
     private boolean isHovered;
+    private Color color;
     
-    public TimePeriodBar(TimePoint start, TimePoint end){
+    public TimePeriodBar(TimePoint start, TimePoint end, Color color){
         super(start.getX(), 0, end.getX() - start.getX(), baseH);
         this.start = start;
         this.end = end;
+        this.color = color;
         this.isHovered = false;
     }
     
@@ -36,7 +39,7 @@ public class TimePeriodBar extends RectBound{
     };
     
     public void draw(Graphics g, int minX, String name, boolean isSingleDate){
-        g.setColor(Color.WHITE);
+        g.setColor(color);
         g.fillRect(x - minX, y, w, h);
         g.setColor(Color.DARK_GRAY);
         g.setFont(new Font("Courier", Font.BOLD, 14)); 
@@ -45,7 +48,15 @@ public class TimePeriodBar extends RectBound{
         int halfTextW = textW / 2;
         int halfTextH = textH / 2;
         if(!isSingleDate){
-           g.drawString(name, this.getX() - minX, this.getY() + textH - halfBaseH);
+           if(start.isInRange()){
+               g.drawString(name, this.getX() - minX, this.getY() + textH - halfBaseH);
+           }
+           else if(end.isInRange()){
+               g.drawString(name, this.getX() + this.getW() - minX - textW, this.getY() + textH - halfBaseH);
+           }
+           else{
+               g.drawString(name, 0 , this.getY() + textH - halfBaseH);
+           }
         } 
         /*
         if(start.isInRange()){
@@ -60,5 +71,8 @@ public class TimePeriodBar extends RectBound{
     public void setI(int i) {
         this.i = i;
         this.y = start.getY() - (i * spacing);
+    }
+    public boolean isTouching(int mx, int my){
+        return mx <= (x + w) && mx >= x && my <= (y + h) && my >= y;
     }
 }

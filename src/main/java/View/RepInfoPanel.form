@@ -21,12 +21,16 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="jtfRepCreateDate" alignment="0" max="32767" attributes="0"/>
                           <Component id="jtfRepLink" alignment="0" pref="327" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jtfRepName" min="-2" pref="159" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jtfRepOwnerName" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jtfRepCreateDate" min="-2" pref="159" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jtfLastCommitDate" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -58,7 +62,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jtfRepLink" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jtfRepCreateDate" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jtfRepCreateDate" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jtfLastCommitDate" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -132,6 +139,11 @@
     <Component class="javax.swing.JTextField" name="jtfRepOwnerName">
       <Properties>
         <Property name="text" type="java.lang.String" value="Owner"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="jtfLastCommitDate">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Date"/>
       </Properties>
     </Component>
   </SubComponents>

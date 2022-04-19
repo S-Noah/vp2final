@@ -29,8 +29,8 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
         jtfRepName.setText(r.getName());
         jtfRepLink.setText(r.getHtml_url());
         jtfRepOwnerName.setText(r.getOwner().getLogin());
-        jtfRepCreateDate.setText(r.getCreated_at());
- 
+        jtfRepCreateDate.setText(r.getDateCreated().toString());
+        jtfLastCommitDate.setText(r.getDateLastPushed().toString());
     }
 
     /**
@@ -51,6 +51,7 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
         jLabel1 = new javax.swing.JLabel();
         jtfCommitValue = new javax.swing.JTextField();
         jtfRepOwnerName = new javax.swing.JTextField();
+        jtfLastCommitDate = new javax.swing.JTextField();
 
         lblRepPic.setBackground(new java.awt.Color(255, 255, 255));
         lblRepPic.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -93,6 +94,8 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
 
         jtfRepOwnerName.setText("Owner");
 
+        jtfLastCommitDate.setText("Date");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -102,12 +105,15 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jtfRepCreateDate, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jtfRepLink, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(jtfRepName, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jtfRepOwnerName))))
+                                .addComponent(jtfRepOwnerName))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jtfRepCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jtfLastCommitDate))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(40, 40, 40)
                         .addComponent(jLabel3)
@@ -131,7 +137,9 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jtfRepLink, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jtfRepCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jtfRepCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jtfLastCommitDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -163,6 +171,7 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField jtfCommitValue;
+    private javax.swing.JTextField jtfLastCommitDate;
     private javax.swing.JTextField jtfRepCreateDate;
     private javax.swing.JTextField jtfRepLink;
     private javax.swing.JTextField jtfRepName;

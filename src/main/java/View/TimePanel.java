@@ -61,7 +61,9 @@ public class TimePanel extends javax.swing.JPanel {
     private int halfH;
     
     // Sliding Window Fields,
-    private int zoom;
+   // private int zoom;
+    private int maxScrollVal;
+    private int scrollVal;
     private int maxX;
     private int winMinX;
     private int winMaxX;
@@ -83,7 +85,7 @@ public class TimePanel extends javax.swing.JPanel {
         
         currentMode = Mode.DAYS;
         temporalWidth = 50;
-        zoom = 100;
+        //zoom = 100;
         barHeight = 20;
         halfBarHeight = barHeight / 2;
         
@@ -152,7 +154,8 @@ public class TimePanel extends javax.swing.JPanel {
             temporalNodes.add(new TemporalNode(i, barY, temporalWidth, i % 2 == 1, minDate, currentMode));
         }
         
-        maxX = (currentMode.getNumNodes() * temporalWidth) + temporalWidth;
+        maxX = ((currentMode.getNumNodes() + 2) * temporalWidth);
+        System.out.println(maxX);
     }
     public void setRepNodes(){
         repNodes.clear();
@@ -160,12 +163,17 @@ public class TimePanel extends javax.swing.JPanel {
             repNodes.add(new RepNode(r, minDate, currentMode, barY, temporalWidth));
         }
     }
-    public void updateNodes(){
+    public void updateNodeSpacing(){
         for(TemporalNode node : temporalNodes){
             node.zoomUpdate(temporalWidth);
         }
         for(RepNode node : repNodes){
             node.zoomUpdate(temporalWidth);
+        }
+    }
+    public void updateNodesTimeMode(){
+        for(RepNode node : repNodes){
+            node.changeTimeMode(currentMode);
         }
     }
     public void findNodesInRange(){
@@ -201,6 +209,7 @@ public class TimePanel extends javax.swing.JPanel {
         winMinX = 0;
         winMaxX = w;
         setTemporalNodes();
+        updateNodesTimeMode();
         findNodesInRange();
         repaint();
     }
@@ -208,16 +217,30 @@ public class TimePanel extends javax.swing.JPanel {
         int newTemporalWidth = temporalWidth + 10 * mod;
         if(newTemporalWidth > 40 && newTemporalWidth < 150){
             temporalWidth = newTemporalWidth;
-            maxX = (currentMode.getNumNodes() * temporalWidth);
-            updateNodes();
+            maxX = ((currentMode.getNumNodes() + 2) * temporalWidth);
+            updateNodeSpacing();
+            scrollWindow(scrollVal, maxScrollVal);
             findNodesInRange();
             repaint();
         }
     }
     public void scrollWindow(int val, int maxScroll){
-        int scrollRatio = maxX / maxScroll;
-        winMinX = val * scrollRatio;
-        winMaxX = w + winMinX;
+        this.scrollVal = val;
+        this.maxScrollVal = maxScroll;
+        
+        double scrollRatio = Math.ceil((double)maxX / maxScroll);
+        int min = (int)(val * scrollRatio);
+        if(min < winMinX || winMaxX < maxX){
+            winMinX = min;
+            winMaxX = winMinX + w;
+        }
+        if(winMaxX > maxX){
+            winMaxX = maxX;
+            winMinX = maxX-w;
+        }
+        
+        //System.out.println(val + ", " + maxScroll + ", " + currentMode.getNumNodes() +  ", " + scrollRatio + ", " + maxX + ": " + min + " - " + max + ", " + winMinX +" - " + winMaxX);
+        //System.out.println(maxX + ": " + min + " - " + max + ", " + winMinX +" - " + winMaxX);
         findNodesInRange();
         repaint();
     }
@@ -234,6 +257,9 @@ public class TimePanel extends javax.swing.JPanel {
         g.setColor(Color.BLACK);
         //g.fillRect(0, halfH - halfBarHeight, w, barHeight);
         g.fillRect(0, barY, w, barHeight);
+        
+        
+        
         
         for(Drawable node : nodesToDraw){
             node.draw(g, winMinX, barHeight);
