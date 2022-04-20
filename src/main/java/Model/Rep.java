@@ -7,25 +7,65 @@ package Model;
 import Github.API;
 import Github.FileRequest;
 import Github.RepRequest;
+import java.io.File;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import javax.swing.tree.DefaultMutableTreeNode;
  
 /**
  *
  * @author NoahS
  */
-public class Rep extends RepRequest implements Serializable{
+public class Rep extends RepRequest implements Serializable, Comparable<Rep>{
+    public static File baseImage = new File("logo.png");
+    public static class Language{
+        public static StringBuilder sb = new StringBuilder();
+        private String name;
+        private double numBytes;
+        private double percent;
+        
+        public Language(String name, double numBytes){
+            this.name = name;
+            this.numBytes = numBytes;
+            this.percent = 0.0f;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public double getPercent() {
+            return percent;
+        }
+
+        public void calcPercent(double totalBytes) {
+            this.percent = numBytes / totalBytes;
+        }
+        @Override
+        public String toString(){
+            sb.setLength(0);
+            sb.append(name);
+            sb.append(" - ");
+            sb.append(String.format("%.1f", percent * 100));
+            sb.append("%");
+            return sb.toString();
+        }
+    }
     public static Rep[] CreateRepInsts(String userRepsUrl){
         RepRequest requests[] = API.getInstance().getReps(userRepsUrl);
-        Rep reps[] = new Rep[requests.length];
-        int i = 0;
+        ArrayList<Rep> validReps = new ArrayList();
         for(RepRequest rr : requests){
-            reps[i] = new Rep(rr);
-            i++;
+            if((!rr.isFork()) && !rr.getName().equals("TimelineMedia")){
+                validReps.add(new Rep(rr));
+            }
         }
-        return reps;
+        Collections.sort(validReps);
+        return validReps.toArray(new Rep[validReps.size()]);
     }
     
     public static Rep CreateRepInst(String login, String repName){
@@ -35,13 +75,7 @@ public class Rep extends RepRequest implements Serializable{
         }
         return new Rep(rr);
     }
-    
-    
-    //private FileRequest contents[];
-    private Folder contents;
-    private DefaultMutableTreeNode root;
-    private LocalDateTime dateCreated;
-    private LocalDateTime dateLastPushed;
+   
     
     public static void print(FileRequest frs[]){
         for(FileRequest fr : frs){
@@ -49,12 +83,32 @@ public class Rep extends RepRequest implements Serializable{
         }
     }
     
+    //private FileRequest contents[];
+    private Folder contents;
+    private DefaultMutableTreeNode root;
+    private LocalDate dateCreated;
+    private LocalDate dateLastPushed;
+    private ArrayList<Language> langs;
+    private double totalBytes;
+    
     public Rep(RepRequest repRequest){
         this.copy(repRequest);
         contents = new Folder();
-        dateCreated = LocalDateTime.parse(created_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        dateLastPushed = LocalDateTime.parse(pushed_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        langs = new ArrayList<>();
+        this.totalBytes = 0;
+        dateCreated = LocalDateTime.parse(created_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDate();
+        dateLastPushed = LocalDateTime.parse(pushed_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDate();
         
+        HashMap<String, Double> langMap = API.getInstance().getLanguages(languages_url);
+        for(String key : langMap.keySet()){
+            double bytes = langMap.get(key).doubleValue();
+            totalBytes += bytes;
+            //System.out.println((int)langMap.get(key));
+            langs.add(new Language(key, bytes));
+        }
+        for(Language l : langs){
+            l.calcPercent((int)totalBytes);
+        }
         /*
         FileRequest repFileRequests[] = API.getInstance().getContents(owner.getLogin(), name, "");
         contents.addFileRequests(repFileRequests);
@@ -63,16 +117,41 @@ public class Rep extends RepRequest implements Serializable{
         root = new DefaultMutableTreeNode(name);
         makeTree(contents, root);
         */
-       
     }
+    
+    public void initFolders(){
+        FileRequest repFileRequests[] = API.getInstance().getContents(owner.getLogin(), name, "");
+        contents.addFileRequests(repFileRequests);
+        fillContents(contents);
+        
+        root = new DefaultMutableTreeNode(name);
+        makeTree(contents, root);
+    }
+
+    public LocalDate getDateCreated() {
+        return dateCreated;
+    }
+
+    public LocalDate getDateLastPushed() {
+        return dateLastPushed;
+    }
+    
     public Folder getContents(){
         return contents;
     }
+
+    public ArrayList<Language> getLangs() {
+        return langs;
+    }
+    
     public DefaultMutableTreeNode getRoot(){
         return root;
     }
     public void fillContents(){
         FileRequest repFileRequests[] = API.getInstance().getContents(owner.getLogin(), name, "");
+//        for(FileRequest fr : repFileRequests){
+//            System.out.println(fr);
+//        }
         contents.addFileRequests(repFileRequests);
         fillContents(contents);
         
@@ -92,12 +171,16 @@ public class Rep extends RepRequest implements Serializable{
             root.add(fNode);
             makeTree(f, fNode);
         }
-        for(File f : folder.getFileValues()){
+        for(GFile f : folder.getFileValues()){
             root.add(new DefaultMutableTreeNode(f.getName()));
         }
     }
     @Override
     public String toString(){
         return name;
+    }
+    @Override
+    public int compareTo(Rep rep){
+        return this.dateCreated.compareTo(rep.getDateCreated()) * -1;
     }
 }

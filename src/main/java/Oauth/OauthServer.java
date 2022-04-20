@@ -54,11 +54,11 @@ public class OauthServer{
                 exchange.sendResponseHeaders(200, response.length);
                 os.write(response);
                 os.close();
-                
             }
             catch(IOException e){
                 e.printStackTrace();
             }
+            exchange.close();
         }
     }
 }

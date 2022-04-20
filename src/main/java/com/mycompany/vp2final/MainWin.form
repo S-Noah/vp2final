@@ -17,6 +17,14 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenu1ActionPerformed"/>
           </Events>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="itemSocialMe">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Me"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemSocialMeActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="itemSocialSearch">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Search"/>
@@ -25,6 +33,15 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemSocialSearchActionPerformed"/>
               </Events>
             </MenuItem>
+            <Menu class="javax.swing.JMenu" name="itemSocialFollowing">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Following"/>
+              </Properties>
+              <Events>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="itemSocialFollowingItemStateChanged"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="itemSocialFollowingActionPerformed"/>
+              </Events>
+            </Menu>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu2">
@@ -94,7 +111,7 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="filler1" max="32767" attributes="0"/>
-                          <Component id="pnlMain" pref="1088" max="32767" attributes="0"/>
+                          <Component id="pnlMain" pref="1588" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -107,16 +124,19 @@
           <Group type="102" alignment="1" attributes="0">
               <Component id="searchUserPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="filler1" max="32767" attributes="0"/>
+              <Component id="filler1" pref="75" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="pnlMain" min="-2" pref="563" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="pnlMain" min="-2" pref="800" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
     <Container class="javax.swing.JPanel" name="pnlMain">
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="pnlMainMouseClicked"/>
+      </Events>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignCardLayout"/>
       <SubComponents>
@@ -135,6 +155,9 @@
           </Constraints>
         </Component>
         <Component class="View.TimelineWindowPanel" name="winTimeline">
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="winTimelineMouseClicked"/>
+          </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
               <CardConstraints cardName="timelineWindow"/>
@@ -144,6 +167,9 @@
       </SubComponents>
     </Container>
     <Component class="View.SearchUserPanel" name="searchUserPanel">
+      <Events>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="searchUserPanelFocusLost"/>
+      </Events>
     </Component>
     <Component class="javax.swing.Box$Filler" name="filler1">
     </Component>

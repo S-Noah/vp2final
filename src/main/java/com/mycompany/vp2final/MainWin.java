@@ -6,13 +6,27 @@ package com.mycompany.vp2final;
 
 import Model.User;
 import java.awt.CardLayout;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
 
 /**
  *
  * @author NoahS
  */
 public class MainWin extends javax.swing.JFrame{
-
+    private static class followersAction extends AbstractAction{
+        private String login;
+        private followersAction(String login){
+            super(login);
+            this.login = login;
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Main.LoginSearchEvent(this.login);
+        }
+        
+    }
+    
     /**
      * Creates new form MultiWindow
      */
@@ -21,10 +35,20 @@ public class MainWin extends javax.swing.JFrame{
     public MainWin() {
         initComponents();
         searchUserPanel.setVisible(false);
+        
     }
-    
+    public void reset(){
+        searchUserPanel.setVisible(false);
+    }
+    public void updateFollowing(){
+        itemSocialFollowing.removeAll();
+        for(String login : User.getFollowingLogins()){
+            itemSocialFollowing.add(new followersAction(login));
+        }
+    }
     public void setUser(User user){
         this.user = user;
+        
         winTimeline.setUser(user);
         
         if(user.ownsMediaRep()){
@@ -34,6 +58,7 @@ public class MainWin extends javax.swing.JFrame{
             repMediaManagerPanel.clear();
         }
         changePanel("timelineWindow");
+        updateFollowing();
     }
     public void changePanel(String cardName){
         CardLayout cardLayout = (CardLayout)pnlMain.getLayout();
@@ -57,7 +82,9 @@ public class MainWin extends javax.swing.JFrame{
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        itemSocialMe = new javax.swing.JMenuItem();
         itemSocialSearch = new javax.swing.JMenuItem();
+        itemSocialFollowing = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         itemViewTimeline = new javax.swing.JMenuItem();
         itemViewRepMedia = new javax.swing.JMenuItem();
@@ -72,10 +99,27 @@ public class MainWin extends javax.swing.JFrame{
             }
         });
 
+        pnlMain.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlMainMouseClicked(evt);
+            }
+        });
         pnlMain.setLayout(new java.awt.CardLayout());
         pnlMain.add(signInPanel, "signInPanel");
         pnlMain.add(repMediaManagerPanel, "repMediaManagerPanel");
+
+        winTimeline.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                winTimelineMouseClicked(evt);
+            }
+        });
         pnlMain.add(winTimeline, "timelineWindow");
+
+        searchUserPanel.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                searchUserPanelFocusLost(evt);
+            }
+        });
 
         jMenu1.setText("Social");
         jMenu1.addActionListener(new java.awt.event.ActionListener() {
@@ -84,6 +128,14 @@ public class MainWin extends javax.swing.JFrame{
             }
         });
 
+        itemSocialMe.setText("Me");
+        itemSocialMe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemSocialMeActionPerformed(evt);
+            }
+        });
+        jMenu1.add(itemSocialMe);
+
         itemSocialSearch.setText("Search");
         itemSocialSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -91,6 +143,19 @@ public class MainWin extends javax.swing.JFrame{
             }
         });
         jMenu1.add(itemSocialSearch);
+
+        itemSocialFollowing.setText("Following");
+        itemSocialFollowing.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                itemSocialFollowingItemStateChanged(evt);
+            }
+        });
+        itemSocialFollowing.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemSocialFollowingActionPerformed(evt);
+            }
+        });
+        jMenu1.add(itemSocialFollowing);
 
         jMenuBar1.add(jMenu1);
 
@@ -132,7 +197,7 @@ public class MainWin extends javax.swing.JFrame{
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(pnlMain, javax.swing.GroupLayout.DEFAULT_SIZE, 1088, Short.MAX_VALUE))
+                            .addComponent(pnlMain, javax.swing.GroupLayout.DEFAULT_SIZE, 1588, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -140,9 +205,9 @@ public class MainWin extends javax.swing.JFrame{
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(searchUserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlMain, javax.swing.GroupLayout.PREFERRED_SIZE, 563, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlMain, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -158,7 +223,7 @@ public class MainWin extends javax.swing.JFrame{
     }//GEN-LAST:event_itemViewRepMediaActionPerformed
 
     private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
-        
+     
     }//GEN-LAST:event_jMenu1ActionPerformed
 
     private void itemSocialSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemSocialSearchActionPerformed
@@ -167,11 +232,37 @@ public class MainWin extends javax.swing.JFrame{
     }//GEN-LAST:event_itemSocialSearchActionPerformed
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        searchUserPanel.setVisible(false);
+        this.reset();
     }//GEN-LAST:event_formMouseClicked
+
+    private void itemSocialMeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemSocialMeActionPerformed
+        this.setUser(User.getMainUser());
+    }//GEN-LAST:event_itemSocialMeActionPerformed
+
+    private void itemSocialFollowingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemSocialFollowingActionPerformed
+        System.out.println("Following.");
+    }//GEN-LAST:event_itemSocialFollowingActionPerformed
+
+    private void itemSocialFollowingItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_itemSocialFollowingItemStateChanged
+        //System.out.println("Following.");
+    }//GEN-LAST:event_itemSocialFollowingItemStateChanged
+
+    private void searchUserPanelFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchUserPanelFocusLost
+        searchUserPanel.setVisible(false);
+    }//GEN-LAST:event_searchUserPanelFocusLost
+
+    private void pnlMainMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMainMouseClicked
+        this.reset();
+    }//GEN-LAST:event_pnlMainMouseClicked
+
+    private void winTimelineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_winTimelineMouseClicked
+        this.reset();
+    }//GEN-LAST:event_winTimelineMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
+    private javax.swing.JMenu itemSocialFollowing;
+    private javax.swing.JMenuItem itemSocialMe;
     private javax.swing.JMenuItem itemSocialSearch;
     private javax.swing.JMenuItem itemViewRepMedia;
     private javax.swing.JMenuItem itemViewTimeline;
