@@ -6,8 +6,9 @@ package data;
 
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
+import java.io.Reader;
+import java.net.URL;
+import java.util.HashMap;
 import okhttp3.*;
 
 /**
@@ -62,7 +63,13 @@ public class APIClient {
         return response;
     }
     
-    public static Map<String, Object> jsonStringToMap(String js){
-        return gson.fromJson(js, Map.class);
+//    public static Map<String, Object> jsonStringToMap(String js){
+//        return gson.fromJson(js, Map.class);
+//    }
+    public static <K, V> HashMap<K, V>jsonToMap(String js){
+        return gson.fromJson(js, HashMap.class);
+    }
+    public static <K, V> HashMap<K, V>jsonToMap(Reader js){
+        return gson.fromJson(js, HashMap.class);
     }
 }

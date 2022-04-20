@@ -71,15 +71,15 @@ public class RepNode extends RectBound implements Drawable{
         bar.zoomUpdate();
     }
     public void draw(Graphics g, int minX, int tickH){
-        if(mode == TimePanel.Mode.MONTHS){
-            System.out.println(name + ": " + start.getNumMonths());
-        }
-        else if(mode == TimePanel.Mode.YEARS){
-            System.out.println(name + ": " + start.getNumYears());
-        }
-        else{
-            System.out.println(name + ": " + start.getNumDays());
-        }
+//        if(mode == TimePanel.Mode.MONTHS){
+//            System.out.println(name + ": " + start.getNumMonths());
+//        }
+//        else if(mode == TimePanel.Mode.YEARS){
+//            System.out.println(name + ": " + start.getNumYears());
+//        }
+//        else{
+//            System.out.println(name + ": " + start.getNumDays());
+//        }
         
         start.draw(g, minX, tickH);
         end.draw(g, minX, tickH);

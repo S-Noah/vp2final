@@ -155,7 +155,7 @@ public class TimePanel extends javax.swing.JPanel {
         }
         
         maxX = ((currentMode.getNumNodes() + 2) * temporalWidth);
-        System.out.println(maxX);
+        //System.out.println(maxX);
     }
     public void setRepNodes(){
         repNodes.clear();
@@ -257,9 +257,6 @@ public class TimePanel extends javax.swing.JPanel {
         g.setColor(Color.BLACK);
         //g.fillRect(0, halfH - halfBarHeight, w, barHeight);
         g.fillRect(0, barY, w, barHeight);
-        
-        
-        
         
         for(Drawable node : nodesToDraw){
             node.draw(g, winMinX, barHeight);

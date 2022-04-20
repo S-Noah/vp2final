@@ -5,6 +5,7 @@
 package View;
 
 import Model.User;
+import com.mycompany.vp2final.Main;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,6 +23,8 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
     /**
      * Creates new form GithubUserInfoPanel
      */
+    
+    private User user;
     
     public GithubUserInfoPanel() {
         initComponents();
@@ -44,6 +47,7 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
     }
     
     public void setUser(User user){
+        this.user = user;
         jtfUserLogin.setText(user.getLogin());
         jtfUserName.setText(user.getName());
         jtfRepositoryValue.setText(Integer.toString(user.getPublic_repos()));
@@ -67,6 +71,7 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
         jtfRepositoryValue = new javax.swing.JTextField();
         jtfUserName = new javax.swing.JTextField();
         jtfUserLogin = new javax.swing.JTextField();
+        btnFollow = new javax.swing.JButton();
 
         lblUserPic.setBackground(new java.awt.Color(255, 255, 255));
         lblUserPic.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -94,6 +99,13 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
             }
         });
 
+        btnFollow.setText("Follow");
+        btnFollow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFollowActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -101,23 +113,24 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtfConnectionValue, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
                     .addComponent(jtfUserLogin)
+                    .addComponent(jtfUserName)
+                    .addComponent(btnFollow, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel6)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtfRepositoryValue))
-                    .addComponent(jtfUserName))
+                        .addComponent(jtfConnectionValue, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jtfRepositoryValue)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblUserPic, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addContainerGap()
                 .addComponent(jtfUserLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jtfUserName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -129,6 +142,8 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(jtfConnectionValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnFollow)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addComponent(lblUserPic, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -143,10 +158,18 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
     private void jtfUserLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfUserLoginActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jtfUserLoginActionPerformed
+
+    private void btnFollowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFollowActionPerformed
+        if(user.getLogin() != User.getMainUser().getLogin()){
+            User.getMainUser().follow(user.getLogin());
+            Main.mw.updateFollowing();
+        }
+    }//GEN-LAST:event_btnFollowActionPerformed
     
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnFollow;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JTextField jtfConnectionValue;

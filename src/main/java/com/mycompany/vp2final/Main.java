@@ -9,10 +9,16 @@ import Oauth.OauthServer;
 import Model.Settings;
 import Model.User;
 import com.formdev.flatlaf.FlatDarculaLaf;
+import data.APIClient;
+import data.UserCache;
 import java.awt.Desktop;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 /**
  *
  * @author NoahS
@@ -24,10 +30,14 @@ public class Main{
      */
     // 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
     private static Settings settings;
-    private static MainWin mw;
+    public static MainWin mw;
+    private static UserCache userCache;
+    public static OauthServer oauthServer;
+    public static HashMap<String, String> langColors;
+    
     public static String client_id = "857a7c08677c3c027965";
     public static String client_secret = "4c848ef04ce448e615f2bb015c82539447b62d99";
-    public static OauthServer oauthServer;
+   
     public static boolean userLoaded = false;
     public static boolean settingsLoaded = false;
     
@@ -70,19 +80,38 @@ public class Main{
         }
     } 
     public static void LoginSearchEvent(String login){
-        User searchedUser = User.fromLogin(login);
-        if(searchedUser != null){
+        User searchedUser = userCache.get(login);
+        if(searchedUser == null){
+            searchedUser = User.fromLogin(login);
+            if(searchedUser != null){
+                userCache.add(searchedUser);
+                mw.setUser(searchedUser);
+            }
+        }
+        else{
             mw.setUser(searchedUser);
         }
-        
+    }
+    
+    public static void loadGithubColors(){
+        try{
+            Reader jsonFile = new FileReader("githubLangColors.json");
+            langColors = APIClient.jsonToMap(jsonFile);
+        }
+        catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args){
         // This approach uses an http request library to directly talk to the github api, More work but more control.
+        
         FlatDarculaLaf.setup();
+        loadGithubColors();
         mw = new MainWin();
         userLoaded = false;
         settingsLoaded = Settings.load();
+        userCache = new UserCache(3);
         
         if(settingsLoaded){
             if(Settings.getInstance().isOauthToken()){

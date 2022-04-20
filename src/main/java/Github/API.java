@@ -9,7 +9,8 @@ import com.mycompany.vp2final.Main;
 import data.APIClient;
 import java.io.IOException;
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -45,6 +46,9 @@ public class API implements Serializable{
         try{
             Request userRequest = APIClient.authedRequest(this.url + "user", "Authorization", "token " + key);
             Response userResponse = APIClient.fire(userRequest);
+            if(userResponse.code() == 404){
+                return null;
+            }
             UserRequest gitUser = gson.fromJson(userResponse.body().string(), UserRequest.class);
             return gitUser;
         }
@@ -94,23 +98,50 @@ public class API implements Serializable{
         }
         return null;
     }
-    public void addFile(String login, String rep, String path, String message, String content){
+    public void addFile(String login, String rep, String path, String message, String content, String sha){
         try{
             String json = "{"
                     + "\"message\":\""+ message + "\","
                     + "\"committer\":{\"name\":\"" + login + "\", \"email\":\"" + login + "@test.com" + "\"},"
                     + "\"author\":{\"name\":\"" + login + "\", \"email\":\"" + login + "@test.com" + "\"},"
-                    + "\"content\":\""+ content + "\""
+                    + "\"content\":\""+ content + "\","
+                    + "\"sha\":\"" + sha + "\""
                     + "}";
             RequestBody body = RequestBody.create(
                 MediaType.parse("application/json"), json);
             
             Request repRequest = APIClient.authedPutRequest(url + "repos/" + login + "/" + rep + "/contents/" + path, body, "Authorization", "token " + key);
             Response repResponse = APIClient.fire(repRequest);
+            System.out.println(repResponse.toString());
         }
         catch(IOException e){
             e.printStackTrace();
         }
+    }
+    public HashMap<String, Double> getLanguages(String url){
+        try{
+            Request langRequest = APIClient.authedRequest(url, "Authorization", "token " + key);
+            Response langResponse = APIClient.fire(langRequest);
+            return APIClient.jsonToMap(langResponse.body().string());
+        }
+        catch(IOException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public ArrayList<String> getStringList(String url){
+        try{
+            Request request = APIClient.authedRequest(url, "Authorization", "token " + key);
+            Response response = APIClient.fire(request);
+            ArrayList list = gson.fromJson(response.body().string(), ArrayList.class);
+            return list;
+        }
+        catch(IOException e){
+            e.printStackTrace();
+            return null;
+        }
+       
     }
   
     public void createRep(String name){

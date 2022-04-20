@@ -22,6 +22,7 @@ public class RepRequest implements Serializable{
     // API Extension URLs.
     protected String html_url;
     protected String commits_url;
+    protected String languages_url;
     
     // Statistic Fields.
     protected String url;
@@ -111,6 +112,11 @@ public class RepRequest implements Serializable{
     public int getSubscribers() {
         return subscribers;
     }
+
+    public String getLanguages_url() {
+        return languages_url;
+    }
+    
     @Override
     public String toString(){
         return name + " : " + id;
@@ -127,6 +133,7 @@ public class RepRequest implements Serializable{
         full_name = repRequest.getFull_name();
         owner = repRequest.getOwner();
         html_url = repRequest.getHtml_url();
+        languages_url = repRequest.getLanguages_url();
         description = repRequest.getDescription();
         fork = repRequest.isFork();
         commits_url = repRequest.getCommits_url();

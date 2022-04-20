@@ -58,14 +58,6 @@ public class TimePeriodBar extends RectBound{
                g.drawString(name, 0 , this.getY() + textH - halfBaseH);
            }
         } 
-        /*
-        if(start.isInRange()){
-            g.fillRect(x, y, w, h);
-        }
-        else{
-            g.fillRect(minX, y, w, h);
-        }
-        */
     }
 
     public void setI(int i) {
