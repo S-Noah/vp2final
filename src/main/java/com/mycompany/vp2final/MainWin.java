@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.mycompany.vp2final;
 
 import Model.User;
@@ -9,10 +5,6 @@ import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
-/**
- *
- * @author NoahS
- */
 public class MainWin extends javax.swing.JFrame{
     private static class followersAction extends AbstractAction{
         private String login;
@@ -27,9 +19,6 @@ public class MainWin extends javax.swing.JFrame{
         
     }
     
-    /**
-     * Creates new form MultiWindow
-     */
     private User user;
     
     public MainWin() {

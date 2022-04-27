@@ -54,7 +54,7 @@ public class LanguagePanel extends JPanel {
                 lastLabelX = textW + boxDiam*2;
             }
             else{
-                System.out.println(halfW + ", " + lastLabelX);
+                //System.out.println(halfW + ", " + lastLabelX);
                 if(lastLabelX >= halfW){
                     if(lastLabelX + boxDiam + 5 >= this.getWidth()){
                         textY += textH + 5;

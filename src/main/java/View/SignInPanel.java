@@ -1,20 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package View;
 
 import Model.Settings;
 import com.mycompany.vp2final.Main;
 
-/**
- *
- * @author NoahS
- */
  public class SignInPanel extends javax.swing.JPanel{
-    /**
-     * Creates new form SignInPanel
-     */
+     
     private Settings settings;
     //private ArrayList<Updatable> observers;
     private static java.awt.Font unHovered = new java.awt.Font("Segoe UI", 1, 14);;

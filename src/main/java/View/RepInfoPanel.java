@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package View;
 
 import Model.Rep;
@@ -16,15 +12,8 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.tree.TreePath;
 
-/**
- *
- * @author NoahS
- */
 public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHandler{
 
-    /**
-     * Creates new form RepInfoPanel
-     */
     private User user;
     public RepInfoPanel() {
         initComponents();

@@ -3,7 +3,6 @@ package View.JGraphics;
 import java.awt.Color;
 import java.awt.Graphics;
 import Model.Rep;
-import View.TimePanel;
 import java.awt.Font;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,27 +19,45 @@ public class RepNode extends RectBound implements Drawable{
     
     private String name;
     private Rep rep;
+    private LocalDate startingDate;
+    private LocalDate endingDate;
     private TimePoint start;
     private TimePoint end;
     private TimePeriodBar bar;
     private TimePanel.Mode mode;
     private Color color = Color.ORANGE;
     
-    public RepNode(Rep r, LocalDate minDate, TimePanel.Mode mode, int timepointY, int space){
+    public RepNode(Rep r, TemporalNode startingDateNode, TemporalNode endingDateNode, TimePanel.Mode mode, int timepointY, int space){
         super();
         rep = r;
         
         this.mode = mode;
         this.name = rep.getName();
-        this.isSingleDate = rep.getDateCreated().equals(rep.getDateLastPushed());
+        this.startingDate = rep.getDateCreated();
+        this.endingDate = rep.getDateLastPushed();
+        this.isSingleDate = startingDate.equals(endingDate);
+        
         if(isSingleDate){
-            this.start = new TimePoint(r.getDateCreated(), minDate, this.mode, space, timepointY, Color.ORANGE);
-            this.end = new TimePoint(r.getDateLastPushed(), minDate, this.mode, space, timepointY, Color.ORANGE);
+            this.start = new TimePoint(startingDateNode, timepointY, Color.ORANGE);
+            this.end = new TimePoint(endingDateNode, timepointY, Color.ORANGE);
         }
         else{
-            this.start = new TimePoint(r.getDateCreated(), minDate, this.mode, space, timepointY, Color.GREEN);
-            this.end = new TimePoint(r.getDateLastPushed(), minDate, this.mode, space, timepointY, Color.RED);
+            this.start = new TimePoint(startingDateNode, timepointY, Color.GREEN);
+            this.end = new TimePoint(endingDateNode, timepointY, Color.RED);
+         
         }
+//        if(isSingleDate){
+//            this.start = new TimePoint(r.getDateCreated(), minDate, this.mode, space, timepointY, Color.ORANGE);
+//            this.end = new TimePoint(r.getDateLastPushed(), minDate, this.mode, space, timepointY, Color.ORANGE);
+//        }
+//        else{
+//            System.out.println(name);
+//            this.start = new TimePoint(r.getDateCreated(), minDate, this.mode, space, timepointY, Color.GREEN);
+//            this.end = new TimePoint(r.getDateLastPushed(), minDate, this.mode, space, timepointY, Color.RED);
+//            start.debug();
+//            end.debug();
+//            System.out.println();
+//        }
         this.bar = new TimePeriodBar(start, end, generateRepColor());
     }
     
@@ -64,10 +81,10 @@ public class RepNode extends RectBound implements Drawable{
         end.zoomUpdate(space);
         bar.zoomUpdate();
     }
-    public void changeTimeMode(TimePanel.Mode mode){
+    public void changeTimeMode(TemporalNode starting, TemporalNode ending, TimePanel.Mode mode){
         this.mode = mode;
-        start.changeTimeMode(mode);
-        end.changeTimeMode(mode);
+        start.setDateNode(starting);
+        end.setDateNode(ending);;
         bar.zoomUpdate();
     }
     public void draw(Graphics g, int minX, int tickH){
@@ -80,10 +97,11 @@ public class RepNode extends RectBound implements Drawable{
 //        else{
 //            System.out.println(name + ": " + start.getNumDays());
 //        }
-        
         start.draw(g, minX, tickH);
-        end.draw(g, minX, tickH);
-        bar.draw(g, minX, name, isSingleDate);
+        if(!isSingleDate){
+            end.draw(g, minX, tickH);
+            bar.draw(g, minX, name, isSingleDate);
+        }
         g.setColor(Color.DARK_GRAY);
     }
     public boolean touchingMouse(int mx, int my){
@@ -92,6 +110,14 @@ public class RepNode extends RectBound implements Drawable{
 
     public boolean isSingleDate() {
         return isSingleDate;
+    }
+
+    public LocalDate getStartingDate() {
+        return startingDate;
+    }
+
+    public LocalDate getEndingDate() {
+        return endingDate;
     }
     
     public void setI(int i){

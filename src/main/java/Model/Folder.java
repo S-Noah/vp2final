@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
 
 import Github.FileRequest;
@@ -12,10 +8,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 
-/**
- *
- * @author NoahS
- */
 public class Folder extends FileRequest{
     private HashMap<String, Folder> folders;
     private HashMap<String, GFile> files;

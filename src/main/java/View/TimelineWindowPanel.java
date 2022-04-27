@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package View;
 
 import Model.Rep;
 import Model.User;
 
-/**
- *
- * @author NoahS
- */
 public class TimelineWindowPanel extends javax.swing.JPanel {
 
     /**
@@ -38,7 +30,7 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlTimeline = new View.TimePanel();
+        pnlTimeline = new View.JGraphics.TimePanel();
         githubUserInfoPanel1 = new View.GithubUserInfoPanel();
         repInfoPanel = new View.RepInfoPanel();
         timelineScrollBar = new javax.swing.JScrollBar();
@@ -181,7 +173,7 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
-    private View.TimePanel pnlTimeline;
+    private View.JGraphics.TimePanel pnlTimeline;
     private View.RepInfoPanel repInfoPanel;
     private javax.swing.JScrollBar timelineScrollBar;
     // End of variables declaration//GEN-END:variables

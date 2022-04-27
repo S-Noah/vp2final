@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package View;
 
 import Model.User;
@@ -14,15 +10,7 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-/**
- *
- * @author NoahS
- */
 public class GithubUserInfoPanel extends javax.swing.JPanel {
-
-    /**
-     * Creates new form GithubUserInfoPanel
-     */
     
     private User user;
     

@@ -63,7 +63,6 @@ public class User extends UserRequest implements Serializable{
             timelineRep.fillContents();
             if(isMainUser){
                 followingFile = timelineRep.getContents().getFile("following.json");
-                System.out.println(followingFile.getDownload_url());
                 followingLogins = API.getInstance().getStringList(followingFile.getDownload_url());
             }
         }

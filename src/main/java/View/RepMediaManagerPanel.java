@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package View;
 
 import Model.Folder;
@@ -20,15 +16,8 @@ import javax.swing.JFileChooser;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-/**
- *
- * @author NoahS
- */
 public class RepMediaManagerPanel extends javax.swing.JPanel {
 
-    /**
-     * Creates new form RepMediaManagerPanel
-     */
     private JFileChooser fc;
     private DefaultListModel<String> dlm;
     private DefaultTreeModel dtm;

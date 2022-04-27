@@ -35,7 +35,7 @@
               <Component id="filler1" min="-2" pref="8" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="repInfoPanel" pref="400" max="32767" attributes="0"/>
+                  <Component id="repInfoPanel" max="32767" attributes="0"/>
                   <Component id="githubUserInfoPanel1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -73,7 +73,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="View.TimePanel" name="pnlTimeline">
+    <Container class="View.JGraphics.TimePanel" name="pnlTimeline">
 
       <Layout>
         <DimensionLayout dim="0">

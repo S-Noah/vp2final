@@ -1,7 +1,5 @@
-package View;
+package View.JGraphics;
 
-import View.JGraphics.RepNode;
-import View.JGraphics.TemporalNode;
 import Model.Rep;
 import Model.User;
 import java.awt.Color;
@@ -11,11 +9,39 @@ import com.mycompany.vp2final.TimelineChangeHandler;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import View.JGraphics.Drawable;
+import java.util.HashMap;
 
 public class TimePanel extends javax.swing.JPanel {
+    
+    private static StringBuilder sb = new StringBuilder();
+    /**
+     * Creates a key using a LocalDate for the hash table of nodes. Also allows lookup up.
+     * @param date The date to create a key string from.
+     * @param mode The mode used to determine the formatting.
+     * @return the resulting formatted key ex. "12/31/2022", "12/31", "2022".
+     */
+    public static String createKey(LocalDate date, TimePanel.Mode mode){
+        sb.setLength(0);
+        if(mode == TimePanel.Mode.MONTHS){
+            sb.append(date.getYear());
+            sb.append("/");
+            sb.append(date.getMonthValue());
+        }
+        else if(mode == TimePanel.Mode.YEARS){
+            sb.append(date.getYear());
+        }
+        else{
+            sb.append(date.getYear());
+            sb.append("/");
+            sb.append(date.getMonthValue());
+            sb.append("/");
+            sb.append(date.getDayOfMonth());
+        }
+        return sb.toString();
+    }
+    
     // Static Fields.
-    public static class Mode{
+    public static class Mode{ // TimePanels Custom Enumeration
         public static Mode DAYS = new Mode(1);
         public static Mode MONTHS = new Mode(2);
         public static Mode YEARS = new Mode(3);
@@ -44,10 +70,10 @@ public class TimePanel extends javax.swing.JPanel {
     private User user;
     
     // Node Fields.
-    private ArrayList<TemporalNode> temporalNodes;
-    private ArrayList<RepNode> repNodes;
-    private ArrayList<Drawable> nodesToDraw;
-    private ArrayList<TimelineChangeHandler> observers;
+    private HashMap<String, TemporalNode> temporalNodes; // Stores all the date ticks.
+    private ArrayList<RepNode> repNodes; // Stores all of a users Repository's as a drawable form.
+    private ArrayList<Drawable> nodesToDraw; // Frame to frame buffer of nodes that are in range.
+    private ArrayList<TimelineChangeHandler> observers; // Obeservers that should react to a click fora repository selection.
     
     // DateRange Fields.
     private LocalDate minDate;
@@ -61,20 +87,18 @@ public class TimePanel extends javax.swing.JPanel {
     private int halfH;
     
     // Sliding Window Fields,
-   // private int zoom;
     private int maxScrollVal;
     private int scrollVal;
     private int maxX;
     private int winMinX;
     private int winMaxX;
     private int temporalWidth;
-    private LocalDate winMinDate;
-    private LocalDate winMaxDate;
     
     // Bar Fields.
     private int barY;
     private int barHeight;
     private int halfBarHeight;
+    
     // Control Window Measurment Update and Initialization, Cannot be done in Constructor because the panel is not packed, instead, I set a flag for a function that will be called before it is painted.
     private boolean initialized;
     private boolean needsDimensionUpdate;
@@ -85,17 +109,16 @@ public class TimePanel extends javax.swing.JPanel {
         
         currentMode = Mode.DAYS;
         temporalWidth = 50;
-        //zoom = 100;
+        
         barHeight = 20;
         halfBarHeight = barHeight / 2;
         
-        temporalNodes = new ArrayList();
         repNodes = new ArrayList();
         nodesToDraw = new ArrayList();
         observers = new ArrayList();
+        temporalNodes = new HashMap<>();
         
         maxDate = LocalDate.now();
-        
         
         initComponents();
     } 
@@ -110,6 +133,9 @@ public class TimePanel extends javax.swing.JPanel {
     }
     
     // Panel Updating Methods.
+    /**
+     * This function runs when the timeline tries to draw the nodes, but they haven't been initialized yet.
+     */
     public void init(){
         initialized = true;
         winMinX = 0;
@@ -137,59 +163,87 @@ public class TimePanel extends javax.swing.JPanel {
         Mode.YEARS.setNumNodes((int)ChronoUnit.YEARS.between(minDate, maxDate.plusYears(1)));
         
         if(initialized){
-            winMinX = 0;
-            winMaxX = w;
-            setTemporalNodes();
-            setRepNodes();
-            findNodesInRange();
+            init();
             repaint();
         }
         else{
             needsDimensionUpdate = true;
         }
     }
+    /**
+     * Clears old temporal nodes and replaces them with new owns based off the current mode.
+     */
     public void setTemporalNodes(){
+        LocalDate tempDate = minDate;
+        String tempKey;
         temporalNodes.clear();
         for(int i = 0; i <= currentMode.getNumNodes(); i++){
-            temporalNodes.add(new TemporalNode(i, barY, temporalWidth, i % 2 == 1, minDate, currentMode));
+            tempKey = createKey(tempDate, currentMode);
+            temporalNodes.put(tempKey, new TemporalNode(i, barY, temporalWidth, i % 2 == 1, tempKey));
+            if(currentMode == Mode.MONTHS){
+                tempDate = tempDate.plusMonths(1);
+            }
+            else if(currentMode == Mode.YEARS){
+                tempDate = tempDate.plusYears(1);
+            }
+            else{
+                tempDate = tempDate.plusDays(1);
+            }
         }
-        
-        maxX = ((currentMode.getNumNodes() + 2) * temporalWidth);
-        //System.out.println(maxX);
+        maxX = ((currentMode.getNumNodes() + 2) * temporalWidth); // Calculating the maximum x for the sliding window.
     }
+    /**
+     * Clears old repository nodes and replaces them with new owns based off of the users repositories.
+     */
     public void setRepNodes(){
         repNodes.clear();
+        TemporalNode tempStart, tempEnd;
         for(Rep r : user.getReps()){
-            repNodes.add(new RepNode(r, minDate, currentMode, barY, temporalWidth));
+            tempStart = getTemporalNodeAt(r.getDateCreated(), currentMode);
+            tempEnd = getTemporalNodeAt(r.getDateLastPushed(), currentMode);
+            repNodes.add(new RepNode(r, tempStart, tempEnd, currentMode, barY, temporalWidth));
         }
     }
+    /**
+     * Updates each node with a new spacing.
+     */
     public void updateNodeSpacing(){
-        for(TemporalNode node : temporalNodes){
+        for(TemporalNode node : temporalNodes.values()){
             node.zoomUpdate(temporalWidth);
         }
         for(RepNode node : repNodes){
             node.zoomUpdate(temporalWidth);
         }
     }
+    /**
+     * Updates the rep nodes when the time mode changes.
+     */
     public void updateNodesTimeMode(){
+        TemporalNode tempStart, tempEnd;
         for(RepNode node : repNodes){
-            node.changeTimeMode(currentMode);
+            tempStart = getTemporalNodeAt(node.getStartingDate(), currentMode);
+            tempEnd = getTemporalNodeAt(node.getEndingDate(), currentMode);
+            node.changeTimeMode(tempStart, tempEnd, currentMode);
         }
     }
+    /**
+     * Fills the drawable buffer with temporal nodes and repository nodes that are in range.
+     */
     public void findNodesInRange(){
         nodesToDraw.clear();
-        for(TemporalNode node : temporalNodes){
+        for(TemporalNode node : temporalNodes.values()){
             if(node.InXRange(winMinX, winMaxX)){
                 nodesToDraw.add(node);
             }
         }
+        // 
         int i = 2;
         for(RepNode node: repNodes){
             if(node.InXRange(winMinX, winMaxX)){
                 if(!node.isSingleDate()){
                     i++;
+                    node.setI(i);
                 }
-                node.setI(i);
                 nodesToDraw.add(node);
             }
         }
@@ -206,24 +260,30 @@ public class TimePanel extends javax.swing.JPanel {
         else{
             currentMode = Mode.DAYS;
         }
-        winMinX = 0;
-        winMaxX = w;
-        setTemporalNodes();
-        updateNodesTimeMode();
-        findNodesInRange();
+        init();
         repaint();
     }
+    /**
+     * changes the the temporal width by 10 based on mod.
+     * @param mod The value to make the amount negative or positive.
+     */
     public void changeTemporalWidth(int mod){
         int newTemporalWidth = temporalWidth + 10 * mod;
         if(newTemporalWidth > 40 && newTemporalWidth < 150){
             temporalWidth = newTemporalWidth;
             maxX = ((currentMode.getNumNodes() + 2) * temporalWidth);
+            
             updateNodeSpacing();
             scrollWindow(scrollVal, maxScrollVal);
             findNodesInRange();
             repaint();
         }
     }
+    /**
+     * Usually used with a JScrollBar. Updates the sliding window based on the value given.
+     * @param val The value to set the window to.
+     * @param maxScroll The max scroll value used to create the bounds of the window.
+     */
     public void scrollWindow(int val, int maxScroll){
         this.scrollVal = val;
         this.maxScrollVal = maxScroll;
@@ -239,8 +299,6 @@ public class TimePanel extends javax.swing.JPanel {
             winMinX = maxX-w;
         }
         
-        //System.out.println(val + ", " + maxScroll + ", " + currentMode.getNumNodes() +  ", " + scrollRatio + ", " + maxX + ": " + min + " - " + max + ", " + winMinX +" - " + winMaxX);
-        //System.out.println(maxX + ": " + min + " - " + max + ", " + winMinX +" - " + winMaxX);
         findNodesInRange();
         repaint();
     }
@@ -255,7 +313,6 @@ public class TimePanel extends javax.swing.JPanel {
         
         Color temp = g.getColor();
         g.setColor(Color.BLACK);
-        //g.fillRect(0, halfH - halfBarHeight, w, barHeight);
         g.fillRect(0, barY, w, barHeight);
         
         for(Drawable node : nodesToDraw){
@@ -300,6 +357,7 @@ public class TimePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_formMouseClicked
 
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        // Handles a repository selection, when the user clickes a rep.
         int mouseX = evt.getX() + winMinX;
         int mouseY = evt.getY();
         for(RepNode node : repNodes){
@@ -308,10 +366,19 @@ public class TimePanel extends javax.swing.JPanel {
                 break;
             }
         }
-        //System.out.println(mouseX + ", " + mouseY + ", " + (mouseX - winMinX));
     }//GEN-LAST:event_formMousePressed
     public int getMaxX(){
         return maxX;
+    }
+    /**
+     * Creates a key from the given date and returns back the TemporalNode that is associated with the date key.
+     * @param date The date to turn into a search key.
+     * @param mode The mode to format the key.
+     * @return 
+     */
+    public TemporalNode getTemporalNodeAt(LocalDate date, Mode mode){
+        String tempKey = createKey(date, mode);
+        return temporalNodes.get(tempKey);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -1,56 +1,33 @@
 package View.JGraphics;
 
-import View.TimePanel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.time.LocalDate;
 
 public class TemporalNode extends RectBound implements Drawable{
-    private static StringBuilder sb = new StringBuilder();
     private static int diam = 4;
     private static int halfDiam = 2;
    
-    private LocalDate date;
-    private TimePanel.Mode mode;
+    //private LocalDate date;
+    //private TimePanel.Mode mode;
     private int i;
     private boolean isBottomNode;
     private String name;
     
-    
-    public TemporalNode(int i, int y, int space, boolean isBottomNode, LocalDate minDate, TimePanel.Mode mode){
+    public TemporalNode(int i, int y, int space, boolean isBottomNode, String name){
         super((i + 1) * space, y, diam, diam);
-        
         this.i = i;
         this.isBottomNode = isBottomNode;
-        this.mode = mode;
+        //this.mode = mode;
         
         this.y -= halfDiam;
         
-        sb.setLength(0);
-        if(mode == TimePanel.Mode.MONTHS){
-            this.date = minDate.plusMonths(i);
-            sb.append(date.getYear());
-            sb.append("/");
-            sb.append(date.getMonthValue());
-        }
-        else if(mode == TimePanel.Mode.YEARS){
-            this.date = minDate.plusYears(i);
-            sb.append(date.getYear());
-        }
-        else{
-            this.date = minDate.plusDays(i);
-            sb.append(date.getYear());
-            sb.append("/");
-            sb.append(date.getMonthValue());
-            sb.append("/");
-            sb.append(date.getDayOfMonth());
-        }
-        this.name = sb.toString();
+        this.name = name;
     }
-    public LocalDate getDate(){
-        return date;
-    }
+//    public LocalDate getDate(){
+//        return date;
+//    }
     public void zoomUpdate(int space){
         this.x = (i + 1) * space;
     }

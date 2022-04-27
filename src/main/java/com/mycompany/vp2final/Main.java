@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package com.mycompany.vp2final;
 
 import Github.API;
@@ -19,15 +15,8 @@ import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-/**
- *
- * @author NoahS
- */
 public class Main{
 
-    /**
-     * @param args the command line arguments
-     */
     // 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
     private static Settings settings;
     public static MainWin mw;
@@ -109,6 +98,7 @@ public class Main{
         FlatDarculaLaf.setup();
         loadGithubColors();
         mw = new MainWin();
+        
         userLoaded = false;
         settingsLoaded = Settings.load();
         userCache = new UserCache(3);

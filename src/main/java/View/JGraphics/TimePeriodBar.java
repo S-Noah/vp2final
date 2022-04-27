@@ -1,18 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package View.JGraphics;
 
-import View.TimePanel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
-/**
- *
- * @author NoahS
- */
 public class TimePeriodBar extends RectBound{
     public static int baseH = 16;
     public static int halfBaseH = baseH/2;

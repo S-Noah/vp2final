@@ -1,8 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Github;
+
 import Oauth.OauthTokenRequest;
 import com.google.gson.Gson;
 import com.mycompany.vp2final.Main;
@@ -16,10 +13,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/**
- *
- * @author NoahS
- */
 public class API implements Serializable{
     private static Gson gson = new Gson();
     private static String url = "https://api.github.com/";
@@ -112,7 +105,6 @@ public class API implements Serializable{
             
             Request repRequest = APIClient.authedPutRequest(url + "repos/" + login + "/" + rep + "/contents/" + path, body, "Authorization", "token " + key);
             Response repResponse = APIClient.fire(repRequest);
-            System.out.println(repResponse.toString());
         }
         catch(IOException e){
             e.printStackTrace();

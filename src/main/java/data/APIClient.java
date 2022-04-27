@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package data;
 
 import com.google.gson.Gson;
@@ -11,10 +7,6 @@ import java.net.URL;
 import java.util.HashMap;
 import okhttp3.*;
 
-/**
- *
- * @author NoahS
- */
 public class APIClient {
     public static OkHttpClient client = new OkHttpClient();
     public static Gson gson = new Gson();
