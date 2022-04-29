@@ -13,11 +13,10 @@ public class TimelineWindowPanel extends javax.swing.JPanel {
         pnlTimeline.addObserver(repInfoPanel);
     }
     public void setUser(User user){
-        //updateTimelineNodes(user.getReps());
         pnlTimeline.setUser(user);
-        timelineScrollBar.setValue(0);
         githubUserInfoPanel1.setUser(user);
         repInfoPanel.setUser(user);
+        timelineScrollBar.setValue(0);
         repInfoPanel.resetComponents();
         
     }

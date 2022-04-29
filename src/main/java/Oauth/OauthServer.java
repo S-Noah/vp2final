@@ -23,6 +23,7 @@ public class OauthServer{
         }
         callBackListener.createContext("/oauth", new CallbackHandler());
         callBackListener.start();
+        System.out.println("starting server. ");
     }
     
     public void stop(){
@@ -34,18 +35,21 @@ public class OauthServer{
            String s = exchange.getRequestURI().toString();
            s = s.substring(s.indexOf('=') + 1);
            Main.OauthRequestEvent(s);
-            
+            System.out.print("serving request. ");
             try{
                 FileInputStream fs;
                 while(true){
+                    System.out.println(Main.userLoaded);
                     if(Main.userLoaded){
                         break;
                     }
                 }
                 if(Main.userLoaded){
+                    System.out.println("success ");
                     fs = new FileInputStream("Oauth/AuthSuccessPage.html");
                 }
                 else{
+                    System.out.println("Failure ");
                     fs = new FileInputStream("Oauth/AuthFailedPage.html");
                 }
                 OutputStream os = exchange.getResponseBody();

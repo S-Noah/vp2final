@@ -90,6 +90,9 @@ public class Folder extends FileRequest{
                 return file;
             }
             folder = folder.getSubfolder(dir.toString());
+            if(folder == null){
+                return null;
+            }
         }
         return folder;
     }

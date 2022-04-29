@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 public class GithubUserInfoPanel extends javax.swing.JPanel {
     
     private User user;
+    private boolean isFollowedByMainUser;
     
     public GithubUserInfoPanel() {
         initComponents();
@@ -41,6 +42,17 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
         jtfRepositoryValue.setText(Integer.toString(user.getPublic_repos()));
         jtfConnectionValue.setText(Integer.toString(user.getFollowers()));
         changeImage(user.getAvatar_url());
+        isFollowedByMainUser = User.getFollowingLogins().contains(user.getLogin());
+        followerUpdate();
+    }
+    
+    public void followerUpdate(){
+        if(isFollowedByMainUser){
+            btnFollow.setText("Unfollow");
+        }
+        else{
+            btnFollow.setText("Follow");
+        }
     }
 
     /**
@@ -149,11 +161,18 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
 
     private void btnFollowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFollowActionPerformed
         if(user.getLogin() != User.getMainUser().getLogin()){
-            User.getMainUser().follow(user.getLogin());
+            if(isFollowedByMainUser){
+                User.getMainUser().unfollow(user.getLogin());
+                isFollowedByMainUser = false;
+            }
+            else{
+                User.getMainUser().follow(user.getLogin());
+                isFollowedByMainUser = true;
+            }
+            followerUpdate();
             Main.mw.updateFollowing();
         }
     }//GEN-LAST:event_btnFollowActionPerformed
-    
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

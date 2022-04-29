@@ -6,9 +6,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 public class MainWin extends javax.swing.JFrame{
-    private static class followersAction extends AbstractAction{
+    private static class followersSearchedAction extends AbstractAction{
         private String login;
-        private followersAction(String login){
+        private followersSearchedAction(String login){
             super(login);
             this.login = login;
         }
@@ -20,11 +20,39 @@ public class MainWin extends javax.swing.JFrame{
     }
     
     private User user;
+    private Thread labelChanger;
     
     public MainWin() {
         initComponents();
+        lblLoading.setVisible(false);
         searchUserPanel.setVisible(false);
-        
+    }
+    public void startLoading(Thread loadingThread){
+        labelChanger = new Thread(new Runnable(){
+            public void run(){
+                lblLoading.setVisible(true);
+                while(loadingThread.isAlive()){
+                    try{
+                    Thread.sleep(200);
+                    }
+                    catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    String loadingText = lblLoading.getText();
+                    if(loadingText.equals("Loading.")){
+                        lblLoading.setText("Loading..");
+                    }
+                    else if(loadingText.equals("Loading..")){
+                        lblLoading.setText("Loading...");
+                    }
+                    else{
+                        lblLoading.setText("Loading.");
+                    }
+                }
+                lblLoading.setVisible(false);
+            }
+        });
+        labelChanger.start();
     }
     public void reset(){
         searchUserPanel.setVisible(false);
@@ -32,7 +60,7 @@ public class MainWin extends javax.swing.JFrame{
     public void updateFollowing(){
         itemSocialFollowing.removeAll();
         for(String login : User.getFollowingLogins()){
-            itemSocialFollowing.add(new followersAction(login));
+            itemSocialFollowing.add(new followersSearchedAction(login));
         }
     }
     public void setUser(User user){
@@ -69,6 +97,8 @@ public class MainWin extends javax.swing.JFrame{
         winTimeline = new View.TimelineWindowPanel();
         searchUserPanel = new View.SearchUserPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
+        lblLoading = new javax.swing.JLabel();
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 5), new java.awt.Dimension(0, 5), new java.awt.Dimension(32767, 5));
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         itemSocialMe = new javax.swing.JMenuItem();
@@ -109,6 +139,10 @@ public class MainWin extends javax.swing.JFrame{
                 searchUserPanelFocusLost(evt);
             }
         });
+
+        lblLoading.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblLoading.setText("Loading.");
+        lblLoading.setEnabled(false);
 
         jMenu1.setText("Social");
         jMenu1.addActionListener(new java.awt.event.ActionListener() {
@@ -180,21 +214,30 @@ public class MainWin extends javax.swing.JFrame{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pnlMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1588, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(searchUserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(693, 693, 693))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(pnlMain, javax.swing.GroupLayout.DEFAULT_SIZE, 1588, Short.MAX_VALUE))
-                        .addContainerGap())))
+                        .addGap(34, 34, 34)
+                        .addComponent(filler2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblLoading, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(searchUserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(searchUserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(lblLoading, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(filler2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
+                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMain, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -250,6 +293,7 @@ public class MainWin extends javax.swing.JFrame{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
     private javax.swing.JMenu itemSocialFollowing;
     private javax.swing.JMenuItem itemSocialMe;
     private javax.swing.JMenuItem itemSocialSearch;
@@ -260,6 +304,7 @@ public class MainWin extends javax.swing.JFrame{
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JLabel lblLoading;
     private javax.swing.JPanel pnlMain;
     private View.RepMediaManagerPanel repMediaManagerPanel;
     private View.SearchUserPanel searchUserPanel;

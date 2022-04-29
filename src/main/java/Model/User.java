@@ -1,6 +1,7 @@
 package Model;
 
 import Github.*;
+import com.mycompany.vp2final.Main;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,6 +29,7 @@ public class User extends UserRequest implements Serializable{
             return false;
         }
         mainUser = new User(request, true);
+        Main.mainUserLoadedEvent();
         return true;
     }
     
@@ -72,9 +74,16 @@ public class User extends UserRequest implements Serializable{
             fillTimelineMediaRep();
         }
     }
+    public void unfollow(String login){
+        followingLogins.remove(login);
+        updateFollowersListFile();
+    }
     public void follow(String login){
-        StringBuilder sb = new StringBuilder();
         followingLogins.add(login);
+        updateFollowersListFile();
+    }
+    public void updateFollowersListFile(){
+        StringBuilder sb = new StringBuilder();
         sb.append("[");
         for(int i = 0; i < followingLogins.size(); i++){
             sb.append('\"');

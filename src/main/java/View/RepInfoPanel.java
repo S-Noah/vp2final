@@ -1,5 +1,6 @@
 package View;
 
+import Github.FileRequest;
 import Model.Rep;
 import Model.User;
 import com.mycompany.vp2final.TimelineChangeHandler;
@@ -45,10 +46,13 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
         languagePanel.changeLangs(r.getLangs());
         try{
             if(user.ownsMediaRep()){
-                String logoUrl = user.getTimelineRep().getContents().follow(new TreePath(new String[]{r.getName(), "logo.png"})).getDownload_url();
-                BufferedImage img = ImageIO.read(new URL(logoUrl));
-                ImageIcon icon = new ImageIcon(img.getScaledInstance(lblRepPic.getWidth(), lblRepPic.getHeight(), Image.SCALE_SMOOTH));
-                lblRepPic.setIcon(icon);
+                TreePath imagePath = new TreePath(new String[]{r.getName(), "logo.png"});
+                FileRequest fileRequest = user.getTimelineRep().getContents().follow(imagePath);
+                if(fileRequest != null){
+                    BufferedImage img = ImageIO.read(new URL(fileRequest.getDownload_url()));
+                    ImageIcon icon = new ImageIcon(img.getScaledInstance(lblRepPic.getWidth(), lblRepPic.getHeight(), Image.SCALE_SMOOTH));
+                    lblRepPic.setIcon(icon);
+                }
             }
         }
         catch(MalformedURLException e){

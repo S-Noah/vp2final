@@ -43,15 +43,18 @@ public class Main{
         }
     }
     
-    public static boolean OauthRequestEvent(String code){
+    public static void mainUserLoadedEvent(){
+        userLoaded = true;
+        mw.setUser(User.getMainUser());
+    }
+    
+    public static void OauthRequestEvent(String code){
         String token = API.tradeCode(code);
         Settings.getInstance().setToken(token, true);
         new API(token);
-        userLoaded = User.loadMainUser();
-        if(userLoaded){
-            mw.setUser(User.getMainUser());
-        }
-        return userLoaded;
+        Thread userLoader = new Thread(() -> User.loadMainUser()); 
+        userLoader.start();
+        mw.startLoading(userLoader);
     }
     
     public static void OauthSigninEvent(){
@@ -97,26 +100,27 @@ public class Main{
         
         FlatDarculaLaf.setup();
         loadGithubColors();
-        mw = new MainWin();
-        
-        userLoaded = false;
         settingsLoaded = Settings.load();
+        mw = new MainWin();
         userCache = new UserCache(3);
+        userLoaded = false;
         
         if(settingsLoaded){
             if(Settings.getInstance().isOauthToken()){
                 System.out.println("Loaded OauthToken");
             }
             new API(Settings.getInstance().getToken());
-            userLoaded = User.loadMainUser();
+            Thread userLoader = new Thread(() -> User.loadMainUser()); 
+            userLoader.start();
+            mw.startLoading(userLoader);
         }
         
-        if(userLoaded){
-            mw.setUser(User.getMainUser());
-        }
-        else if(Settings.getInstance().isOauthToken()){
-            OauthSigninEvent();
-        }
+//        if(userLoaded){
+//            mw.setUser(User.getMainUser());
+//        }
+//        else if(Settings.getInstance().isOauthToken()){
+//            OauthSigninEvent();
+//        }
         mw.setVisible(true);
     }
 }
