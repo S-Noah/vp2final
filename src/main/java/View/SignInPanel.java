@@ -283,6 +283,8 @@ import javax.swing.event.DocumentListener;
                 Main.tokenSignInEvent(token);
             }
         }
+        btnLogin.setVisible(false);
+        chkVerify.setVisible(false);
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnOauthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOauthActionPerformed
