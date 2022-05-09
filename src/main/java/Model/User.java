@@ -36,14 +36,16 @@ public class User extends UserRequest implements Serializable{
      */
     public static boolean loadMainUser(){
         UserRequest request = API.getInstance().getMyself();
-        if(request.equals(null)){
+        if(request == null){
+            Main.mainUserLoadedEvent(false);
             return false;
         }
         else if(request.getLogin() == null){
+            Main.mainUserLoadedEvent(false);
             return false;
         }
         mainUser = new User(request, true);
-        Main.mainUserLoadedEvent();
+        Main.mainUserLoadedEvent(true);
         return true;
     }
     /**
@@ -124,7 +126,6 @@ public class User extends UserRequest implements Serializable{
      */
     public void follow(String login){
         followingLogins.add(login);
-        System.out.println(followingLogins);
         updateFollowersListFile();
     }
     /**

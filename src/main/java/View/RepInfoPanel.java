@@ -1,6 +1,5 @@
 package View;
 
-import Github.FileRequest;
 import Model.Folder;
 import Model.Rep;
 import Model.User;
@@ -16,7 +15,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.tree.TreePath;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -40,6 +38,7 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
         jtfRepLink.setText("");
         jtfRepCreateDate.setText("");
         jtfLastCommitDate.setText("");
+        taDesc.setText("");
         lblRepPic.setIcon(null);
         languagePanel.reset();
     }
@@ -48,7 +47,6 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
         jtfRepLink.setText(r.getHtml_url());
         jtfRepCreateDate.setText(r.getDateCreated().toString());
         jtfLastCommitDate.setText(r.getDateLastPushed().toString());
-        //taDesc.setText();
         languagePanel.changeLangs(r.getLangs());
         jtfWatchersValue.setText(String.valueOf(r.getWatchers_count()));
         try{
@@ -84,13 +82,14 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
                 
                 String desc = descResponse.body().string();
                 taDesc.setText(desc);
+                descResponse.close();
             }
         }
         catch(MalformedURLException e){
-            e.printStackTrace();
+            
         }
         catch(IOException e){
-            e.printStackTrace();
+            
         }
     }
 

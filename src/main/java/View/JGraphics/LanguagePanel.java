@@ -24,13 +24,14 @@ public class LanguagePanel extends JPanel {
         changeLangs(langs);
     }
     public void changeLangs(ArrayList<Rep.Language> langs){
-        this.langs = langs;
+        this.langs.clear();
+        this.langs.addAll(langs);
         repaint();
     }
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        // PIterating Variables.
+        // Iterating Variables.
         g.setFont(new Font("Courier", Font.PLAIN, 12)); 
         int i = 0;
         int x = 0;

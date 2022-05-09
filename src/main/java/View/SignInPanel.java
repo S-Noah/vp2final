@@ -58,7 +58,7 @@ import javax.swing.event.DocumentListener;
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         btnOauth = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
+        lblSignin = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         btnAccess = new javax.swing.JButton();
         chkVerify = new javax.swing.JCheckBox();
@@ -133,11 +133,9 @@ import javax.swing.event.DocumentListener;
                 .addGroup(pnlOauthInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOauthInfoLayout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addComponent(jLabel10)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(pnlOauthInfoLayout.createSequentialGroup()
-                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(jLabel10))
+                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlOauthInfoLayout.setVerticalGroup(
             pnlOauthInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -163,9 +161,9 @@ import javax.swing.event.DocumentListener;
             }
         });
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setText("How would you like to sign in?");
+        lblSignin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblSignin.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSignin.setText("How would you like to sign in?");
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 23, 124));
@@ -190,7 +188,7 @@ import javax.swing.event.DocumentListener;
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(30, 30, 30)
                         .addComponent(jLabel1))
-                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblSignin, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(45, 45, 45)
                         .addComponent(btnOauth, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -206,7 +204,7 @@ import javax.swing.event.DocumentListener;
                 .addGap(3, 3, 3)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
+                .addComponent(lblSignin)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAccess)
@@ -253,11 +251,18 @@ import javax.swing.event.DocumentListener;
         );
     }// </editor-fold>//GEN-END:initComponents
     public void loading(boolean load){
+        if(load){
+            lblSignin.setText("Signing you in now!");
+        }
+        else{
+            lblSignin.setText("How would you like to sign in?");
+        }
         load = !load;
         pnlOauthInfo.setVisible(false);
         pnlTokenInfo.setVisible(false);
         btnOauth.setVisible(load);
         btnAccess.setVisible(load);
+        
     }
     private void updateControlLocks(){
         btnAccess.setEnabled(isOauth);
@@ -307,11 +312,11 @@ import javax.swing.event.DocumentListener;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField jtfToken;
+    private javax.swing.JLabel lblSignin;
     private javax.swing.JPanel pnlOauthInfo;
     private javax.swing.JPanel pnlTokenInfo;
     // End of variables declaration//GEN-END:variables

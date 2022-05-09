@@ -48,18 +48,24 @@ public class API implements Serializable{
      * @return A UserRequest instance that captures the responses JSON.
      */
     public UserRequest getMyself(){
+        Request request;
+        Response response = null;
         try{
-            Request userRequest = APIClient.authedRequest(this.url + "user", "Authorization", "token " + key);
-            Response userResponse = APIClient.fire(userRequest);
-            if(userResponse.code() == 404){
+            request = APIClient.authedRequest(this.url + "user", "Authorization", "token " + key);
+            response = APIClient.fire(request);
+            if(response.code() != 200){
+                response.close();
                 return null;
             }
-            UserRequest gitUser = gson.fromJson(userResponse.body().string(), UserRequest.class);
+            UserRequest gitUser = gson.fromJson(response.body().string(), UserRequest.class);
+            response.close();
             return gitUser;
         }
         catch(IOException e){
-            e.printStackTrace();
             this.invalid = true;
+        }
+        if(response != null){
+            response.close();
         }
         return null;
     }
@@ -69,14 +75,24 @@ public class API implements Serializable{
      * @return A UserRequest instance that captures the responses JSON.
      */
     public UserRequest getUser(String login){
+        Request request;
+        Response response = null;
         try{
-            Request userRequest = APIClient.authedRequest(this.url + "users/" + login, "Authorization", "token " + key);
-            Response userResponse = APIClient.fire(userRequest);
-            UserRequest gitUser = gson.fromJson(userResponse.body().string(), UserRequest.class);
+            request = APIClient.authedRequest(this.url + "users/" + login, "Authorization", "token " + key);
+            response = APIClient.fire(request);
+            if(response.code() != 200){
+                response.close();
+                return null;
+            }
+            UserRequest gitUser = gson.fromJson(response.body().string(), UserRequest.class);
+            response.close();
             return gitUser;
         }
         catch(IOException e){
-            e.printStackTrace();
+            
+        }
+        if(response != null){
+            response.close();
         }
         return null;
     }
@@ -86,14 +102,24 @@ public class API implements Serializable{
      * @return an array of RepRequests representing the response's JSON.
      */
     public RepRequest[] getReps(String url){
-         try{
-            Request repsRequest = APIClient.authedRequest(url, "Authorization", "token " + key);
-            Response repsResponse = APIClient.fire(repsRequest);
-            RepRequest[] userReps = gson.fromJson(repsResponse.body().string(), RepRequest[].class);
+        Request request;
+        Response response = null;
+        try{
+            request = APIClient.authedRequest(url, "Authorization", "token " + key);
+            response = APIClient.fire(request);
+            if(response.code() != 200){
+                response.close();
+                return null;
+            }
+            RepRequest[] userReps = gson.fromJson(response.body().string(), RepRequest[].class);
+            response.close();
             return userReps;
         }
         catch(IOException e){
-            e.printStackTrace();
+            
+        }
+        if(response != null){
+            response.close();
         }
         return null;
     }
@@ -104,17 +130,25 @@ public class API implements Serializable{
      * @return a RepRequest representing the responses JSON.
      */
     public RepRequest getRep(String login, String repName){
-         try{
-            Request request = APIClient.authedRequest(this.url + "repos/" + login + "/" + repName, "Authorization", "token " + key);
-            Response response = APIClient.fire(request);
+        Request request;
+        Response response = null;
+        try{
+            request = APIClient.authedRequest(this.url + "repos/" + login + "/" + repName, "Authorization", "token " + key);
+            response = APIClient.fire(request);
             if(response.code() != 200){
+                response.close();
                 return null;
             }
             RepRequest repRequest = gson.fromJson(response.body().string(), RepRequest.class);
+            response.close();
             return repRequest;
+            
         }
         catch(IOException e){
-            e.printStackTrace();
+            
+        }
+        if(response != null){
+            response.close();
         }
         return null;
     }
@@ -128,6 +162,8 @@ public class API implements Serializable{
      * Takes all params and adds or updates the specific file at a path in a user's repository.
      */
     public void addFile(String login, String rep, String path, String message, String content, String sha){
+        Request request;
+        Response response = null;
         try{
             String json = "{"
                     + "\"message\":\""+ message + "\","
@@ -139,11 +175,16 @@ public class API implements Serializable{
             RequestBody body = RequestBody.create(
                 MediaType.parse("application/json"), json);
             
-            Request repRequest = APIClient.authedPutRequest(url + "repos/" + login + "/" + rep + "/contents/" + path, body, "Authorization", "token " + key);
-            Response repResponse = APIClient.fire(repRequest);
+            request = APIClient.authedPutRequest(url + "repos/" + login + "/" + rep + "/contents/" + path, body, "Authorization", "token " + key);
+            response = APIClient.fire(request);
+            response.close();
+            return;
         }
         catch(IOException e){
-            e.printStackTrace();
+            
+        }
+        if(response != null){
+            response.close();
         }
     }
     /**
@@ -151,15 +192,22 @@ public class API implements Serializable{
      * @return a HashMap containing names to amounts of bytes that represents the response's JSON.
      */
     public HashMap<String, Double> getLanguages(String url){
+        Request request;
+        Response response = null;
         try{
-            Request langRequest = APIClient.authedRequest(url, "Authorization", "token " + key);
-            Response langResponse = APIClient.fire(langRequest);
-            return APIClient.jsonToMap(langResponse.body().string());
+            request = APIClient.authedRequest(url, "Authorization", "token " + key);
+            response = APIClient.fire(request);
+            String responseBody = response.body().string();
+            response.close();
+            return APIClient.jsonToMap(responseBody);
         }
         catch(IOException e){
-            e.printStackTrace();
-            return null;
+            
         }
+        if(response != null){
+            response.close();
+        }
+        return null;
     }
     /**
      * Simple function that gets JSON from a URL.
@@ -167,33 +215,45 @@ public class API implements Serializable{
      * @return a list representing the JSON.
      */
     public ArrayList<String> getStringList(String url){
+        Request request;
+        Response response = null;
         try{
-            Request request = APIClient.authedRequest(url, "Authorization", "token " + key);
-            Response response = APIClient.fire(request);
+            request = APIClient.authedRequest(url, "Authorization", "token " + key);
+            response = APIClient.fire(request);
             ArrayList list = gson.fromJson(response.body().string(), ArrayList.class);
+            response.close();
             return list;
         }
         catch(IOException e){
-            e.printStackTrace();
-            return null;
+
         }
-       
+        if(response != null){
+            response.close();
+        }
+        return null;
     }
     /**
      * @param name the name of the new rep.
      * Creates a new rep for the authenticated user.
      */
     public void createRep(String name){
+        Request request;
+        Response response = null;
          try{
             String json = "{\"name\":\"" + name + "\"}";
             RequestBody body = RequestBody.create(
                 MediaType.parse("application/json"), json);
             
-            Request repRequest = APIClient.authedPostRequest(url + "user/repos", body, "Authorization", "token " + key);
-            Response repResponse = APIClient.fire(repRequest);
+            request = APIClient.authedPostRequest(url + "user/repos", body, "Authorization", "token " + key);
+            response = APIClient.fire(request);
+            response.close();
+            return;
         }
         catch(IOException e){
-            e.printStackTrace();
+            
+        }
+        if(response != null){
+            response.close();
         }
     }
     /**
@@ -205,12 +265,18 @@ public class API implements Serializable{
      */
     public FileRequest[] getContents(String login, String repName, String path){
         Request request = APIClient.authedRequest(url + "repos/" +login + "/" + repName + "/contents/" + path, "Authorization", "token " + key);
+        Response response = null;
         try{
-            Response response = APIClient.fire(request);
-            return gson.fromJson(response.body().string(), FileRequest[].class);
+            response = APIClient.fire(request);
+            String responseBody = response.body().string();
+            response.close();
+            return gson.fromJson(responseBody, FileRequest[].class);
         }
         catch(IOException e){
-            e.printStackTrace();
+            
+        }
+        if(response != null){
+            response.close();
         }
         return null;
     }
@@ -234,14 +300,19 @@ public class API implements Serializable{
                 .post(body)
                 .header("Accept", "application/json")
                 .build();
+        Response response = null;
         
         try{
-            Response response = APIClient.fire(request);
+            response = APIClient.fire(request);
             OauthTokenRequest tokenRequest = gson.fromJson(response.body().string(), OauthTokenRequest.class);
+            response.close();
             return tokenRequest.getAccessToken();
         }
         catch(IOException e){
-            e.printStackTrace();
+            
+        }
+        if(response != null){
+            response.close();
         }
         return "";
     }

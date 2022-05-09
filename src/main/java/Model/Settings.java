@@ -1,7 +1,7 @@
 package Model;
 
-import Github.API;
 import data.FileIO;
+import java.io.File;
 import java.io.Serializable;
 
 public class Settings implements Serializable{
@@ -18,6 +18,11 @@ public class Settings implements Serializable{
             instance.loadedSettings = true;
             return true;
         }
+    }
+    
+    public static void delete(){
+        File f = new File(filename);
+        f.delete();
     }
     
     public static Settings getInstance(){

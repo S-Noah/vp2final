@@ -27,7 +27,8 @@ public class Main{
     public static String client_secret = "4c848ef04ce448e615f2bb015c82539447b62d99"; // GitHub App Data.
    
     public static boolean userLoaded = false; // Flag for incase a user load fails.
-    public static boolean settingsLoaded = false;// Flag for incase a user load fails.
+    public static boolean settingsLoaded = false;// Flag for incase a Setting load fails.
+    public static boolean userLoadFailed = false;
     
     /**
      * When this event method is called the OAuth server is started, and the user is directed to GitHub Login.
@@ -36,16 +37,15 @@ public class Main{
     public static void OauthSigninEvent(){
         if(oauthServer == null){
             oauthServer = new OauthServer();
-            mw.displayError("Starting oauth server...", 1000);
         }
         try{
             Desktop.getDesktop().browse(new URI("https://github.com/login/oauth/authorize?scope=repo%20delete_repo&client_id=857a7c08677c3c027965"));
         }
         catch(URISyntaxException e){
-            e.printStackTrace();
+            
         }
         catch(IOException e){
-            e.printStackTrace();
+            
         }
     } 
     /**
@@ -74,9 +74,14 @@ public class Main{
     /**
      * When the main user is successfully loaded, the Application is alerted.
      */
-    public static void mainUserLoadedEvent(){
-        userLoaded = true;
-        mw.setUser(User.getMainUser());
+    public static void mainUserLoadedEvent(boolean loaded){
+        userLoaded = loaded;
+        if(userLoaded)
+            mw.setUser(User.getMainUser());
+        else{
+            userLoadFailed = true;
+            mw.displayError("Error Loading User", 10000);
+        }
     }
     /**
      * When another user is searched for, check the cache for an existing search, if not use GitHub.API to search. Update cache and Application.
@@ -107,7 +112,7 @@ public class Main{
             langColors = APIClient.jsonToMap(jsonFile);
         }
         catch(FileNotFoundException e){
-            e.printStackTrace();
+            
         }
     }
 

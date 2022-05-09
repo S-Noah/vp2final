@@ -32,10 +32,10 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
             lblUserPic.setIcon(icon);
         }  
         catch(MalformedURLException e){
-            e.printStackTrace();
+            
         }   
         catch(IOException e){
-            e.printStackTrace();
+            
         }
        
     }

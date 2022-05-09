@@ -1,5 +1,6 @@
 package com.mycompany.vp2final;
 
+import Model.Settings;
 import Model.User;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -31,6 +32,7 @@ public class MainWin extends javax.swing.JFrame{
         searchUserPanel.setVisible(false);
         socialMenu.setEnabled(false);
         viewMenu.setEnabled(false);
+        settingsMenu.setEnabled(false);
         setPreferredSize(new Dimension(400, 500));
         pack();
     }
@@ -63,7 +65,7 @@ public class MainWin extends javax.swing.JFrame{
                     Thread.sleep(200);
                     }
                     catch(InterruptedException e){
-                        e.printStackTrace();
+                        
                     }
                     String loadingText = lblLoading.getText();
                     if(loadingText.equals("Loading.")){
@@ -102,6 +104,7 @@ public class MainWin extends javax.swing.JFrame{
         changePanel("timelineWindow", winTimeline.getPreferredSize());
         socialMenu.setEnabled(true);
         viewMenu.setEnabled(true);
+        settingsMenu.setEnabled(true);
         updateFollowing();
     }
     public void changePanel(String cardName, Dimension size){
@@ -140,14 +143,13 @@ public class MainWin extends javax.swing.JFrame{
         itemViewTimeline = new javax.swing.JMenuItem();
         itemViewRepMedia = new javax.swing.JMenuItem();
         settingsMenu = new javax.swing.JMenu();
+        menuitmSignOut = new javax.swing.JMenuItem();
 
         jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("GitSocial");
         setIconImage(new ImageIcon("gs.jpeg").getImage());
-        setMaximumSize(new java.awt.Dimension(1650, 900));
-        setPreferredSize(new java.awt.Dimension(1650, 900));
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
@@ -246,6 +248,15 @@ public class MainWin extends javax.swing.JFrame{
         userMenu.add(viewMenu);
 
         settingsMenu.setText("Settings");
+
+        menuitmSignOut.setText("Sign Out");
+        menuitmSignOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuitmSignOutActionPerformed(evt);
+            }
+        });
+        settingsMenu.add(menuitmSignOut);
+
         userMenu.add(settingsMenu);
 
         setJMenuBar(userMenu);
@@ -315,11 +326,11 @@ public class MainWin extends javax.swing.JFrame{
     }//GEN-LAST:event_itemSocialMeActionPerformed
 
     private void itemSocialFollowingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemSocialFollowingActionPerformed
-        System.out.println("Following.");
+
     }//GEN-LAST:event_itemSocialFollowingActionPerformed
 
     private void itemSocialFollowingItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_itemSocialFollowingItemStateChanged
-        //System.out.println("Following.");
+        
     }//GEN-LAST:event_itemSocialFollowingItemStateChanged
 
     private void searchUserPanelFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchUserPanelFocusLost
@@ -334,6 +345,11 @@ public class MainWin extends javax.swing.JFrame{
         this.reset();
     }//GEN-LAST:event_winTimelineMouseClicked
 
+    private void menuitmSignOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuitmSignOutActionPerformed
+        Settings.delete();
+        Main.mw.dispose();
+    }//GEN-LAST:event_menuitmSignOutActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
@@ -345,6 +361,7 @@ public class MainWin extends javax.swing.JFrame{
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JLabel lblError;
     private javax.swing.JLabel lblLoading;
+    private javax.swing.JMenuItem menuitmSignOut;
     private javax.swing.JPanel pnlMain;
     private View.RepMediaManagerPanel repMediaManagerPanel;
     private View.SearchUserPanel searchUserPanel;

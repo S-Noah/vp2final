@@ -45,6 +45,26 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
         }
         lstRep.setModel(dlm);
     }
+    
+    private ImageIcon resizeIcon(BufferedImage img){
+        int newW, newH;
+        int imgWidth = img.getWidth();
+        int imgHeight = img.getHeight();
+        int lblWidth = lblPicture.getWidth();
+        int lblHeight = lblPicture.getHeight();
+
+        newW = imgWidth;
+        newH = imgHeight;
+        if(imgWidth> lblWidth){
+            newW = lblWidth;
+            newH = (newW * imgHeight) / imgWidth;
+        }
+        if(newH > lblHeight){
+            newH = lblHeight;
+            newW = (newH * imgWidth) / imgHeight;
+        }
+        return new ImageIcon(img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH));
+    }
  
      private void update(int i){
         if(user.ownsMediaRep()){
@@ -59,40 +79,23 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
                 String descUrl = f.getFile("desc.txt").getDownload_url();
                 
                 BufferedImage img = ImageIO.read(new URL(logoUrl));
-                
-                int newW, newH;
-                int imgWidth = img.getWidth();
-                int imgHeight = img.getHeight();
-                int lblWidth = lblPicture.getWidth();
-                int lblHeight = lblPicture.getHeight();
-                
-                newW = imgWidth;
-                newH = imgHeight;
-                if(imgWidth> lblWidth){
-                    newW = lblWidth;
-                    newH = (newW * imgHeight) / imgWidth;
-                }
-                if(newH > lblHeight){
-                    newH = lblHeight;
-                    newW = (newH * imgWidth) / imgHeight;
-                }
            
-                ImageIcon icon = new ImageIcon(img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH));
+                ImageIcon icon = resizeIcon(img);
                 
                 lblPicture.setIcon(icon);
                 
                 Request descRequest = APIClient.request(descUrl);
                 Response descResponse = APIClient.fire(descRequest);
                 String desc = descResponse.body().string();
-                
+                descResponse.close();
                 taDesc.setText(desc);
                 
             }  
             catch(MalformedURLException e){
-                e.printStackTrace();
+                
             }   
             catch(IOException e){
-                e.printStackTrace();
+               
             }
         }
     }
@@ -210,16 +213,16 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
                 File file = fc.getSelectedFile();
                 if(file != null){
                     try{
-                        BufferedImage img = ImageIO.read(file);
                         currentImage = file;
-                        ImageIcon icon = new ImageIcon(img.getScaledInstance(lblPicture.getWidth(), lblPicture.getHeight(), Image.SCALE_SMOOTH));
+                        BufferedImage img = ImageIO.read(file);
+                        ImageIcon icon = resizeIcon(img);
                         lblPicture.setIcon(icon);
                     }  
                     catch(MalformedURLException e){
-                        e.printStackTrace();
+                        
                     }   
                     catch(IOException e){
-                        e.printStackTrace();
+                        
                     }
                 }  
             }

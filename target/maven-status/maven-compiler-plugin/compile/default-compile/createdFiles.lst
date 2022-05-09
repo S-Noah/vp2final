@@ -1,6 +1,7 @@
 com\mycompany\vp2final\MainWin$8.class
 com\mycompany\vp2final\Observable.class
 View\RepInfoPanel$2.class
+View\RepMediaManagerPanel$4.class
 Github\UserRequest.class
 Oauth\OauthServer$CallbackHandler.class
 View\SignInPanel$4.class

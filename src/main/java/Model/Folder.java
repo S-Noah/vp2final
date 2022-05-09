@@ -32,7 +32,6 @@ public class Folder extends FileRequest{
         }
     }
     public void add(FileRequest fr){
-        //System.out.println(fr.getPath());
         if(fr.getType().equals("dir")){
             folders.put(fr.getName(), new Folder(fr));
         }
