@@ -1,5 +1,7 @@
 package View.JGraphics;
-
+/**
+ * This is a class that defines a rectangular boundary for the Timeline Panel.
+ */
 abstract public class RectBound {
     protected int x;
     protected int y;

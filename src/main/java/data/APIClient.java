@@ -1,22 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package data;
 
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URL;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import okhttp3.*;
 
-/**
- *
- * @author NoahS
- */
 public class APIClient {
     public static OkHttpClient client = new OkHttpClient();
+    
     public static Gson gson = new Gson();
     
     public static Request request(String url){
@@ -59,17 +52,15 @@ public class APIClient {
     
     public static Response fire(Request request) throws IOException{
         Response response = client.newCall(request).execute();
-        //System.out.println(response.toString());
+       
         return response;
     }
     
-//    public static Map<String, Object> jsonStringToMap(String js){
-//        return gson.fromJson(js, Map.class);
-//    }
     public static <K, V> HashMap<K, V>jsonToMap(String js){
         return gson.fromJson(js, HashMap.class);
     }
     public static <K, V> HashMap<K, V>jsonToMap(Reader js){
         return gson.fromJson(js, HashMap.class);
+ 
     }
 }

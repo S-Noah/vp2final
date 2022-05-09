@@ -1,50 +1,41 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package View;
 
 import Model.Folder;
 import Model.Rep;
 import Model.User;
+import data.APIClient;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import okhttp3.Request;
+import okhttp3.Response;
 
-/**
- *
- * @author NoahS
- */
 public class RepMediaManagerPanel extends javax.swing.JPanel {
 
-    /**
-     * Creates new form RepMediaManagerPanel
-     */
     private JFileChooser fc;
     private DefaultListModel<String> dlm;
-    private DefaultTreeModel dtm;
-    private DefaultMutableTreeNode root;
     private User user;
+    private File currentImage;
+    private String currentRepName;
     
     public RepMediaManagerPanel() {
         dlm = new DefaultListModel<>();
-        root = new DefaultMutableTreeNode("");
-        dtm = new DefaultTreeModel(root);
         fc = new JFileChooser();
         initComponents();
     }
     
     public void setUser(User user){
-        clear();
         this.user =  user;
         dlm.clear();
         int i = 0;
@@ -52,44 +43,61 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
             dlm.add(i, r.getName());
             i++;
         }
-        //lstRep.setModel(dlm);
-    }
-    public void clear(){
-        dlm.clear();
-        root = new DefaultMutableTreeNode("");
-        dtm = new DefaultTreeModel(root);
-        treeMedia.setModel(dtm);
+        lstRep.setModel(dlm);
     }
     
-     public void update(){
-        int i = lstRep.getSelectedIndex();
-        if(i > -1 && i < dlm.getSize()){
-            Folder f = user.getTimelineRep().getContents().getSubfolder(dlm.elementAt(i));
-            root = f.getTree();
-            dtm = new DefaultTreeModel(root);
-            treeMedia.setModel(dtm);
+    private ImageIcon resizeIcon(BufferedImage img){
+        int newW, newH;
+        int imgWidth = img.getWidth();
+        int imgHeight = img.getHeight();
+        int lblWidth = lblPicture.getWidth();
+        int lblHeight = lblPicture.getHeight();
+
+        newW = imgWidth;
+        newH = imgHeight;
+        if(imgWidth> lblWidth){
+            newW = lblWidth;
+            newH = (newW * imgHeight) / imgWidth;
+        }
+        if(newH > lblHeight){
+            newH = lblHeight;
+            newW = (newH * imgWidth) / imgHeight;
+        }
+        return new ImageIcon(img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH));
+    }
+ 
+     private void update(int i){
+        if(user.ownsMediaRep()){
+            currentRepName = dlm.elementAt(i);
+            jtfName.setText(currentRepName);
+            btnSave.setEnabled(true);
+            taDesc.setEnabled(true);
+            
+            Folder f = user.getTimelineRep().getContents().getSubfolder(currentRepName);
             try{
                 String logoUrl = f.getFile("logo.png").getDownload_url();
+                String descUrl = f.getFile("desc.txt").getDownload_url();
+                
                 BufferedImage img = ImageIO.read(new URL(logoUrl));
-                ImageIcon icon = new ImageIcon(img.getScaledInstance(lblPicture.getWidth(), lblPicture.getHeight(), Image.SCALE_SMOOTH));
+           
+                ImageIcon icon = resizeIcon(img);
+                
                 lblPicture.setIcon(icon);
+                
+                Request descRequest = APIClient.request(descUrl);
+                Response descResponse = APIClient.fire(descRequest);
+                String desc = descResponse.body().string();
+                descResponse.close();
+                taDesc.setText(desc);
+                
             }  
             catch(MalformedURLException e){
-                e.printStackTrace();
+                
             }   
             catch(IOException e){
-                e.printStackTrace();
+               
             }
         }
-        
-        /*
-        // This handles repository contents
-        int i = lstRep.getSelectedIndex();
-        selectedRep = user.getRepAt(i);
-        root = selectedRep.getRoot();
-        dtm = new DefaultTreeModel(root);
-        treeMedia.setModel(dtm);
-        */
     }
 
     /**
@@ -101,14 +109,49 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btnSave = new javax.swing.JButton();
+        lblPicture = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        taDesc = new javax.swing.JTextArea();
+        jtfName = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         lstRep = new javax.swing.JList<>();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        treeMedia = new javax.swing.JTree();
-        jButton1 = new javax.swing.JButton();
-        lblPicture = new javax.swing.JLabel();
-        btnChangePhoto = new javax.swing.JButton();
 
+        setPreferredSize(new java.awt.Dimension(910, 800));
+
+        btnSave.setText("Save");
+        btnSave.setEnabled(false);
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
+
+        lblPicture.setBackground(new java.awt.Color(255, 255, 255));
+        lblPicture.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPicture.setOpaque(true);
+        lblPicture.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblPictureMouseClicked(evt);
+            }
+        });
+
+        taDesc.setColumns(20);
+        taDesc.setLineWrap(true);
+        taDesc.setRows(5);
+        taDesc.setText("This is the repository description!");
+        taDesc.setWrapStyleWord(true);
+        taDesc.setEnabled(false);
+        jScrollPane3.setViewportView(taDesc);
+
+        jtfName.setEditable(false);
+        jtfName.setFont(new java.awt.Font("sansserif", 0, 18)); // NOI18N
+        jtfName.setBorder(javax.swing.BorderFactory.createTitledBorder("Current Repository"));
+        jtfName.setFocusable(false);
+
+        jScrollPane1.setBorder(null);
+
+        lstRep.setBackground(new java.awt.Color(102, 102, 102));
         lstRep.setModel(dlm);
         lstRep.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -117,104 +160,102 @@ public class RepMediaManagerPanel extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(lstRep);
 
-        treeMedia.setModel(dtm);
-        treeMedia.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
-            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
-                treeMediaValueChanged(evt);
-            }
-        });
-        jScrollPane2.setViewportView(treeMedia);
-
-        jButton1.setText("Save");
-
-        btnChangePhoto.setText("Change Photo");
-        btnChangePhoto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnChangePhotoActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jtfName)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSave))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnChangePhoto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1))
-                    .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jtfName, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                    .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnChangePhoto)
-                            .addComponent(jButton1))))
-                .addContainerGap(55, Short.MAX_VALUE))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void lstRepValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstRepValueChanged
-        update();
+        if(!evt.getValueIsAdjusting()){
+            int i = lstRep.getSelectedIndex();
+            if(i > -1){
+                update(i);
+            }
+        }
     }//GEN-LAST:event_lstRepValueChanged
 
-    private void treeMediaValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_treeMediaValueChanged
-
-        /*
-        // This handles reposiory contents
-        if(treeMedia.getSelectionPath() != null && selectedRep != null){
-            TreePath path = treeMedia.getSelectionPath();
-            FileRequest fr = selectedRep.getContents().follow(path, selectedRep.getName());
-            System.out.println(fr.toString());
-        }
-        */
-    }//GEN-LAST:event_treeMediaValueChanged
-
-    private void btnChangePhotoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePhotoActionPerformed
-        int ret = fc.showOpenDialog(null);
-        if(ret == JFileChooser.APPROVE_OPTION){
-            File file = fc.getSelectedFile();
-            if(file != null){
-                try{
-                    BufferedImage img = ImageIO.read(file);
-                    ImageIcon icon = new ImageIcon(img.getScaledInstance(lblPicture.getWidth(), lblPicture.getHeight(), Image.SCALE_SMOOTH));
-                    lblPicture.setIcon(icon);
+    private void lblPictureMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPictureMouseClicked
+        if(lstRep.getSelectedIndex() > -1){
+            int ret = fc.showOpenDialog(null);
+            if(ret == JFileChooser.APPROVE_OPTION){
+                File file = fc.getSelectedFile();
+                if(file != null){
+                    try{
+                        currentImage = file;
+                        BufferedImage img = ImageIO.read(file);
+                        ImageIcon icon = resizeIcon(img);
+                        lblPicture.setIcon(icon);
+                    }  
+                    catch(MalformedURLException e){
+                        
+                    }   
+                    catch(IOException e){
+                        
+                    }
                 }  
-                catch(MalformedURLException e){
-                    e.printStackTrace();
-                }   
-                catch(IOException e){
-                    e.printStackTrace();
-                }
-            }  
+            }
         }
-    }//GEN-LAST:event_btnChangePhotoActionPerformed
+    }//GEN-LAST:event_lblPictureMouseClicked
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+
+        Thread apiThread = new Thread(new Runnable(){
+            public void run(){
+                try {
+                    FileInputStream fis = new FileInputStream(currentImage);
+                    byte[] imageData = fis.readAllBytes();
+                    byte[] descData = taDesc.getText().getBytes();
+                    User.getMainUser().updateRepMedia(currentRepName, imageData, descData);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(RepMediaManagerPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(RepMediaManagerPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        apiThread.start();
+    }//GEN-LAST:event_btnSaveActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnChangePhoto;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnSave;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextField jtfName;
     private javax.swing.JLabel lblPicture;
     private javax.swing.JList<String> lstRep;
-    private javax.swing.JTree treeMedia;
+    private javax.swing.JTextArea taDesc;
     // End of variables declaration//GEN-END:variables
 }

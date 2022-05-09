@@ -1,30 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package View;
 
 import Model.User;
 import com.mycompany.vp2final.Main;
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-/**
- *
- * @author NoahS
- */
 public class GithubUserInfoPanel extends javax.swing.JPanel {
-
-    /**
-     * Creates new form GithubUserInfoPanel
-     */
     
     private User user;
+    private boolean isFollowedByMainUser;
     
     public GithubUserInfoPanel() {
         initComponents();
@@ -38,10 +32,10 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
             lblUserPic.setIcon(icon);
         }  
         catch(MalformedURLException e){
-            e.printStackTrace();
+            
         }   
         catch(IOException e){
-            e.printStackTrace();
+            
         }
        
     }
@@ -52,7 +46,24 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
         jtfUserName.setText(user.getName());
         jtfRepositoryValue.setText(Integer.toString(user.getPublic_repos()));
         jtfConnectionValue.setText(Integer.toString(user.getFollowers()));
+        jtfLink.setText(user.getHtml_url());
+ 
+        chkGitSocialUser.setSelected(this.user.ownsMediaRep());
         changeImage(user.getAvatar_url());
+
+        isFollowedByMainUser = User.getFollowingLogins().contains(user.getLogin());
+        followerUpdate();
+       
+        btnFollow.setVisible(!this.user.isMainUser());
+    }
+    
+    public void followerUpdate(){
+        if(isFollowedByMainUser){
+            btnFollow.setText("Unfollow");
+        }
+        else{
+            btnFollow.setText("Follow");
+        }
     }
 
     /**
@@ -64,41 +75,68 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblUserPic = new javax.swing.JLabel();
-        jtfConnectionValue = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jtfRepositoryValue = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
         jtfUserName = new javax.swing.JTextField();
+        jtfRepositoryValue = new javax.swing.JTextField();
+        jtfLink = new javax.swing.JTextField();
         jtfUserLogin = new javax.swing.JTextField();
         btnFollow = new javax.swing.JButton();
+        jtfConnectionValue = new javax.swing.JTextField();
+        chkGitSocialUser = new javax.swing.JCheckBox();
+        lblUserPic = new javax.swing.JLabel();
 
-        lblUserPic.setBackground(new java.awt.Color(255, 255, 255));
-        lblUserPic.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblUserPic.setOpaque(true);
+        setPreferredSize(new java.awt.Dimension(475, 150));
 
-        jtfConnectionValue.setText("10");
+        jPanel1.setPreferredSize(new java.awt.Dimension(350, 180));
 
-        jLabel7.setText("Connections: ");
-
-        jLabel6.setText("Repositories: ");
-
-        jtfRepositoryValue.setText("27");
-
-        jtfUserName.setText("nsarge");
+        jtfUserName.setEditable(false);
+        jtfUserName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfUserName.setForeground(new java.awt.Color(255, 255, 255));
+        jtfUserName.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Name", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfUserName.setFocusable(false);
         jtfUserName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jtfUserNameActionPerformed(evt);
             }
         });
 
-        jtfUserLogin.setText("S-Noah");
+        jtfRepositoryValue.setEditable(false);
+        jtfRepositoryValue.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfRepositoryValue.setForeground(new java.awt.Color(255, 255, 255));
+        jtfRepositoryValue.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtfRepositoryValue.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Reps", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfRepositoryValue.setFocusable(false);
+
+        jtfLink.setEditable(false);
+        jtfLink.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfLink.setForeground(new java.awt.Color(255, 255, 255));
+        jtfLink.setToolTipText("Open URL");
+        jtfLink.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Link", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfLink.setFocusable(false);
+        jtfLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtfLinkMouseClicked(evt);
+            }
+        });
+        jtfLink.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfLinkActionPerformed(evt);
+            }
+        });
+
+        jtfUserLogin.setEditable(false);
+        jtfUserLogin.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfUserLogin.setForeground(new java.awt.Color(255, 255, 255));
+        jtfUserLogin.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Login", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfUserLogin.setFocusable(false);
         jtfUserLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jtfUserLoginActionPerformed(evt);
             }
         });
 
+        btnFollow.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnFollow.setForeground(new java.awt.Color(255, 255, 255));
         btnFollow.setText("Follow");
         btnFollow.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -106,48 +144,90 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
             }
         });
 
+        jtfConnectionValue.setEditable(false);
+        jtfConnectionValue.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfConnectionValue.setForeground(new java.awt.Color(255, 255, 255));
+        jtfConnectionValue.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtfConnectionValue.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Followers", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfConnectionValue.setFocusable(false);
+        jtfConnectionValue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfConnectionValueActionPerformed(evt);
+            }
+        });
+
+        chkGitSocialUser.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        chkGitSocialUser.setText("Uses GitSocial");
+        chkGitSocialUser.setToolTipText("");
+        chkGitSocialUser.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        chkGitSocialUser.setFocusable(false);
+        chkGitSocialUser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkGitSocialUserActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jtfLink)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jtfUserLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jtfUserName))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jtfConnectionValue, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jtfRepositoryValue, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(chkGitSocialUser, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 15, Short.MAX_VALUE))
+                            .addComponent(btnFollow, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jtfUserLogin)
+                    .addComponent(jtfUserName))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jtfLink, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(chkGitSocialUser)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnFollow))
+                    .addComponent(jtfRepositoryValue)
+                    .addComponent(jtfConnectionValue))
+                .addContainerGap())
+        );
+
+        lblUserPic.setBackground(new java.awt.Color(255, 255, 255));
+        lblUserPic.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblUserPic.setOpaque(true);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jtfUserLogin)
-                    .addComponent(jtfUserName)
-                    .addComponent(btnFollow, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtfConnectionValue, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtfRepositoryValue)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblUserPic, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jtfUserLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jtfUserName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(jtfRepositoryValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jtfConnectionValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnFollow)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(lblUserPic, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(lblUserPic, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -161,18 +241,48 @@ public class GithubUserInfoPanel extends javax.swing.JPanel {
 
     private void btnFollowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFollowActionPerformed
         if(user.getLogin() != User.getMainUser().getLogin()){
-            User.getMainUser().follow(user.getLogin());
+            if(isFollowedByMainUser){
+                User.getMainUser().unfollow(user.getLogin());
+                isFollowedByMainUser = false;
+            }
+            else{
+                User.getMainUser().follow(user.getLogin());
+                isFollowedByMainUser = true;
+            }
+            followerUpdate();
             Main.mw.updateFollowing();
         }
     }//GEN-LAST:event_btnFollowActionPerformed
-    
+
+    private void chkGitSocialUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkGitSocialUserActionPerformed
+        chkGitSocialUser.setSelected(!chkGitSocialUser.isSelected());
+    }//GEN-LAST:event_chkGitSocialUserActionPerformed
+
+    private void jtfLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfLinkActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtfLinkActionPerformed
+
+    private void jtfConnectionValueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfConnectionValueActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtfConnectionValueActionPerformed
+
+    private void jtfLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtfLinkMouseClicked
+        try {
+            Desktop.getDesktop().browse(new URI(user.getHtml_url()));
+        } catch (URISyntaxException ex) {
+            
+        } catch (IOException ex) {
+            
+        }
+    }//GEN-LAST:event_jtfLinkMouseClicked
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnFollow;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JCheckBox chkGitSocialUser;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField jtfConnectionValue;
+    private javax.swing.JTextField jtfLink;
     private javax.swing.JTextField jtfRepositoryValue;
     private javax.swing.JTextField jtfUserLogin;
     private javax.swing.JTextField jtfUserName;

@@ -18,7 +18,6 @@ public class OauthServer{
             callBackListener = HttpServer.create(new InetSocketAddress("127.0.0.1", 8001), 0);
         }
         catch(IOException e){
-            e.printStackTrace();
             return;
         }
         callBackListener.createContext("/oauth", new CallbackHandler());
@@ -31,15 +30,18 @@ public class OauthServer{
      
     private class CallbackHandler implements HttpHandler{
         public void handle(HttpExchange exchange){
+           boolean waiting = true;
            String s = exchange.getRequestURI().toString();
            s = s.substring(s.indexOf('=') + 1);
-           Main.OauthRequestEvent(s);
-            
+           Main.OauthSuccessEvent(s);
             try{
                 FileInputStream fs;
-                while(true){
+                while(waiting){
                     if(Main.userLoaded){
-                        break;
+                        waiting = false;
+                    }
+                    else if(Main.userLoadFailed){
+                        waiting = false;
                     }
                 }
                 if(Main.userLoaded){
@@ -56,7 +58,7 @@ public class OauthServer{
                 os.close();
             }
             catch(IOException e){
-                e.printStackTrace();
+                
             }
             exchange.close();
         }

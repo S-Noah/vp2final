@@ -1,17 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
 package View.JGraphics;
 
 import java.awt.Graphics;
-
-/**
- *
- * @author NoahS
- */
+// Interface for components on the scrollable timeline panel.
 public interface Drawable {
-    public boolean InXRange(int x1, int x2);
-    public void zoomUpdate(int space);
+    public boolean InXRange(int x1, int x2); // Checks if this rect is in the range of the sliding window.
+    public void zoomUpdate(int space); // Updates the nodes dimensions based on the window.
     public void draw(Graphics g, int minX, int barHeight);
 }
