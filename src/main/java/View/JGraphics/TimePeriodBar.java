@@ -4,13 +4,18 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
+/**
+ * This class is a clickable Rendering of a Rep. It spans between 2 TimePoints which are created useing the Rep's data.
+ */
 public class TimePeriodBar extends RectBound{
+    // Static variables for size and spacing.
     public static int baseH = 16;
     public static int halfBaseH = baseH/2;
     public static int hoveredHeight = 12;
     public static int spacing = 30;
     
-    private int i;
+    // The bar takes 2 parent TimePoints to span across.
+    private int i;  // This determines the height of the bar so they all fit.
     private TimePoint start;
     private TimePoint end;
     private boolean isHovered;
@@ -38,7 +43,7 @@ public class TimePeriodBar extends RectBound{
         int textH = g.getFontMetrics().getHeight();
         int halfTextW = textW / 2;
         int halfTextH = textH / 2;
-        if(!isSingleDate){
+        if(!isSingleDate){ // This draws the name on the start if it can, then the end if it can, and if not 0 because the Rep the start and end are hidden.
            if(start.isInRange()){
                g.drawString(name, this.getX() - minX, this.getY() + textH - halfBaseH);
            }

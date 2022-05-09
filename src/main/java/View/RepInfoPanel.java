@@ -1,17 +1,24 @@
 package View;
 
 import Github.FileRequest;
+import Model.Folder;
 import Model.Rep;
 import Model.User;
 import com.mycompany.vp2final.TimelineChangeHandler;
+import data.APIClient;
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.tree.TreePath;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHandler{
 
@@ -29,30 +36,54 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
         updateComponents(r);
     }
     public void resetComponents(){
-        jtfRepName.setText("Repository");
-        jtfRepLink.setText("Link");
-        jtfRepOwnerName.setText("Owner");
-        jtfRepCreateDate.setText("Date Created");
-        jtfLastCommitDate.setText("Date Last Updated");
+        jtfRepName.setText("");
+        jtfRepLink.setText("");
+        jtfRepCreateDate.setText("");
+        jtfLastCommitDate.setText("");
         lblRepPic.setIcon(null);
         languagePanel.reset();
     }
     public void updateComponents(Rep r){
         jtfRepName.setText(r.getName());
         jtfRepLink.setText(r.getHtml_url());
-        jtfRepOwnerName.setText(r.getOwner().getLogin());
         jtfRepCreateDate.setText(r.getDateCreated().toString());
         jtfLastCommitDate.setText(r.getDateLastPushed().toString());
+        //taDesc.setText();
         languagePanel.changeLangs(r.getLangs());
+        jtfWatchersValue.setText(String.valueOf(r.getWatchers_count()));
         try{
             if(user.ownsMediaRep()){
-                TreePath imagePath = new TreePath(new String[]{r.getName(), "logo.png"});
-                FileRequest fileRequest = user.getTimelineRep().getContents().follow(imagePath);
-                if(fileRequest != null){
-                    BufferedImage img = ImageIO.read(new URL(fileRequest.getDownload_url()));
-                    ImageIcon icon = new ImageIcon(img.getScaledInstance(lblRepPic.getWidth(), lblRepPic.getHeight(), Image.SCALE_SMOOTH));
-                    lblRepPic.setIcon(icon);
+                Folder f = user.getTimelineRep().getContents().getSubfolder(r.getName());
+                String logoUrl = f.getFile("logo.png").getDownload_url();
+                String descUrl = f.getFile("desc.txt").getDownload_url();
+                
+                Request descRequest = APIClient.request(descUrl);
+                Response descResponse = APIClient.fire(descRequest);
+                
+                BufferedImage img = ImageIO.read(new URL(logoUrl));
+                
+                int newW, newH;
+                int imgWidth = img.getWidth();
+                int imgHeight = img.getHeight();
+                int lblWidth = lblRepPic.getWidth();
+                int lblHeight = lblRepPic.getHeight();
+                
+                newW = imgWidth;
+                newH = imgHeight;
+                if(imgWidth> lblWidth){
+                    newW = lblWidth;
+                    newH = (newW * imgHeight) / imgWidth;
                 }
+                if(newH > lblHeight){
+                    newH = lblHeight;
+                    newW = (newH * imgWidth) / imgHeight;
+                }
+           
+                ImageIcon icon = new ImageIcon(img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH));
+                lblRepPic.setIcon(icon);
+                
+                String desc = descResponse.body().string();
+                taDesc.setText(desc);
             }
         }
         catch(MalformedURLException e){
@@ -72,125 +103,166 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblRepPic = new javax.swing.JLabel();
-        jtfRepName = new javax.swing.JTextField();
-        jtfRepLink = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
         jtfRepCreateDate = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        jtfWatchersValue = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jtfCommitValue = new javax.swing.JTextField();
-        jtfRepOwnerName = new javax.swing.JTextField();
         jtfLastCommitDate = new javax.swing.JTextField();
+        jtfRepLink = new javax.swing.JTextField();
+        jtfRepName = new javax.swing.JTextField();
+        jtfWatchersValue = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        taDesc = new javax.swing.JTextArea();
+        lblRepPic = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         languagePanel = new View.JGraphics.LanguagePanel();
 
-        lblRepPic.setBackground(new java.awt.Color(255, 255, 255));
-        lblRepPic.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblRepPic.setOpaque(true);
-
-        jtfRepName.setText("Repository Name");
-        jtfRepName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfRepNameActionPerformed(evt);
-            }
-        });
-
-        jtfRepLink.setText("Repository Link");
-
-        jtfRepCreateDate.setText("Date");
+        jtfRepCreateDate.setEditable(false);
+        jtfRepCreateDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfRepCreateDate.setForeground(new java.awt.Color(255, 255, 255));
+        jtfRepCreateDate.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Start Date", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfRepCreateDate.setFocusable(false);
         jtfRepCreateDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jtfRepCreateDateActionPerformed(evt);
             }
         });
 
-        jLabel3.setText("Watchers: ");
+        jtfLastCommitDate.setEditable(false);
+        jtfLastCommitDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfLastCommitDate.setForeground(new java.awt.Color(255, 255, 255));
+        jtfLastCommitDate.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "End Date", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfLastCommitDate.setFocusable(false);
 
-        jtfWatchersValue.setText("100");
+        jtfRepLink.setEditable(false);
+        jtfRepLink.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfRepLink.setForeground(new java.awt.Color(255, 255, 255));
+        jtfRepLink.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Link", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfRepLink.setFocusable(false);
+        jtfRepLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtfRepLinkMouseClicked(evt);
+            }
+        });
+        jtfRepLink.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfRepLinkActionPerformed(evt);
+            }
+        });
+
+        jtfRepName.setEditable(false);
+        jtfRepName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfRepName.setForeground(new java.awt.Color(255, 255, 255));
+        jtfRepName.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Name", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfRepName.setFocusable(false);
+        jtfRepName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfRepNameActionPerformed(evt);
+            }
+        });
+
+        jtfWatchersValue.setEditable(false);
+        jtfWatchersValue.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jtfWatchersValue.setForeground(new java.awt.Color(255, 255, 255));
+        jtfWatchersValue.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtfWatchersValue.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Watchers", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
+        jtfWatchersValue.setFocusable(false);
         jtfWatchersValue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jtfWatchersValueActionPerformed(evt);
             }
         });
 
-        jLabel1.setText("Commits: ");
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Description", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
 
-        jtfCommitValue.setText("10");
-        jtfCommitValue.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfCommitValueActionPerformed(evt);
-            }
-        });
+        taDesc.setEditable(false);
+        taDesc.setColumns(20);
+        taDesc.setForeground(new java.awt.Color(255, 255, 255));
+        taDesc.setLineWrap(true);
+        taDesc.setRows(5);
+        taDesc.setWrapStyleWord(true);
+        taDesc.setFocusable(false);
+        jScrollPane2.setViewportView(taDesc);
 
-        jtfRepOwnerName.setText("Owner");
+        lblRepPic.setBackground(new java.awt.Color(255, 255, 255));
+        lblRepPic.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblRepPic.setOpaque(true);
 
-        jtfLastCommitDate.setText("Date");
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Languages", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12))); // NOI18N
 
         javax.swing.GroupLayout languagePanelLayout = new javax.swing.GroupLayout(languagePanel);
         languagePanel.setLayout(languagePanelLayout);
         languagePanelLayout.setHorizontalGroup(
             languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 438, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         languagePanelLayout.setVerticalGroup(
             languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 212, Short.MAX_VALUE)
+            .addGap(0, 90, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(languagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(languagePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jtfRepName, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jtfWatchersValue))
+            .addComponent(jtfRepLink, javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jtfRepCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jtfLastCommitDate))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+            .addComponent(lblRepPic, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 475, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(lblRepPic, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jtfRepName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jtfWatchersValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jtfRepLink, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jtfLastCommitDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jtfRepCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblRepPic, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jtfRepLink, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jtfRepName, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jtfRepOwnerName))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jtfRepCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jtfLastCommitDate)))
-                    .addComponent(languagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jtfWatchersValue, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jtfCommitValue, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(109, 109, 109))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(lblRepPic, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtfRepName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jtfRepOwnerName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jtfRepLink, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtfRepCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jtfLastCommitDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(jtfWatchersValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1)
-                    .addComponent(jtfCommitValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(languagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -206,22 +278,32 @@ public class RepInfoPanel extends javax.swing.JPanel implements TimelineChangeHa
         // TODO add your handling code here:
     }//GEN-LAST:event_jtfWatchersValueActionPerformed
 
-    private void jtfCommitValueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfCommitValueActionPerformed
+    private void jtfRepLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfRepLinkActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jtfCommitValueActionPerformed
+    }//GEN-LAST:event_jtfRepLinkActionPerformed
+
+    private void jtfRepLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtfRepLinkMouseClicked
+        try {
+            Desktop.getDesktop().browse(new URI(jtfRepLink.getText()));
+        } catch (URISyntaxException ex) {
+            
+        } catch (IOException ex) {
+            
+        }
+    }//GEN-LAST:event_jtfRepLinkMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JTextField jtfCommitValue;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jtfLastCommitDate;
     private javax.swing.JTextField jtfRepCreateDate;
     private javax.swing.JTextField jtfRepLink;
     private javax.swing.JTextField jtfRepName;
-    private javax.swing.JTextField jtfRepOwnerName;
     private javax.swing.JTextField jtfWatchersValue;
     private View.JGraphics.LanguagePanel languagePanel;
     private javax.swing.JLabel lblRepPic;
+    private javax.swing.JTextArea taDesc;
     // End of variables declaration//GEN-END:variables
 }

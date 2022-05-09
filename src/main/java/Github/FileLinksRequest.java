@@ -1,7 +1,9 @@
 package Github;
 
 import java.io.Serializable;
-
+/**
+ * 
+ */
 public class FileLinksRequest implements Serializable{
         protected String self;
         protected String git;

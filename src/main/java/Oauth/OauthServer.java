@@ -34,7 +34,7 @@ public class OauthServer{
         public void handle(HttpExchange exchange){
            String s = exchange.getRequestURI().toString();
            s = s.substring(s.indexOf('=') + 1);
-           Main.OauthRequestEvent(s);
+           Main.OauthSuccessEvent(s);
             System.out.print("serving request. ");
             try{
                 FileInputStream fs;

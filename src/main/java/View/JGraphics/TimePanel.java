@@ -99,7 +99,7 @@ public class TimePanel extends javax.swing.JPanel {
     private int barHeight;
     private int halfBarHeight;
     
-    // Control Window Measurment Update and Initialization, Cannot be done in Constructor because the panel is not packed, instead, I set a flag for a function that will be called before it is painted.
+    // Control Window Measurment Update and Initialization, Cannot be done in Constructor because the panel it is not packed, instead, I set a flag for a function that will be called before it is painted.
     private boolean initialized;
     private boolean needsDimensionUpdate;
     
@@ -144,6 +144,10 @@ public class TimePanel extends javax.swing.JPanel {
         setRepNodes();
         findNodesInRange();
     }
+    /**
+     * Calculates Dimensions and inits storage for Drawables if needed.
+     * Flag function so I can get the width and height of the panel, Cannot do it in constructor.
+     */
     public void updateDimensions(){
         needsDimensionUpdate = false;
         this.w = this.getWidth();
@@ -155,6 +159,10 @@ public class TimePanel extends javax.swing.JPanel {
             init();
         }
     } 
+    /**
+     * Changes the user and calculates the amount of time between account creation and now. This is used for TemporalNodes.
+     * @param user 
+     */
     public void setUser(User user){
         this.user = user;
         this.minDate = this.user.getDateCreated();

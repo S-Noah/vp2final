@@ -17,49 +17,26 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 public class Main{
 
-    // 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
     private static Settings settings;
-    public static MainWin mw;
-    private static UserCache userCache;
-    public static OauthServer oauthServer;
-    public static HashMap<String, String> langColors;
+    public static MainWin mw; // Some ckasses need to talk to the main window, just as they do main.
+    private static UserCache userCache; // Cache for User searches, optimized feature.
+    public static OauthServer oauthServer; // Server incase user needs to sign in.
+    public static HashMap<String, String> langColors; // Hashmap of GitHub's languages to colors.
     
-    public static String client_id = "857a7c08677c3c027965";
-    public static String client_secret = "4c848ef04ce448e615f2bb015c82539447b62d99";
+    public static String client_id = "857a7c08677c3c027965"; // GitHub App Data.
+    public static String client_secret = "4c848ef04ce448e615f2bb015c82539447b62d99"; // GitHub App Data.
    
-    public static boolean userLoaded = false;
-    public static boolean settingsLoaded = false;
+    public static boolean userLoaded = false; // Flag for incase a user load fails.
+    public static boolean settingsLoaded = false;// Flag for incase a user load fails.
     
-    // https://github.com/login/oauth/authorize?scope=repo&client_id=857a7c08677c3c027965
-    // https://github.com/login/oauth/authorize?scope=repo%20delete_repo&client_id=857a7c08677c3c027965
-    
-    
-    public static void signInEvent(String token){
-        Settings.getInstance().setToken(token, false);
-        new API(token);
-        userLoaded = User.loadMainUser();
-        if(userLoaded){
-            mw.setUser(User.getMainUser());
-        }
-    }
-    
-    public static void mainUserLoadedEvent(){
-        userLoaded = true;
-        mw.setUser(User.getMainUser());
-    }
-    
-    public static void OauthRequestEvent(String code){
-        String token = API.tradeCode(code);
-        Settings.getInstance().setToken(token, true);
-        new API(token);
-        Thread userLoader = new Thread(() -> User.loadMainUser()); 
-        userLoader.start();
-        mw.startLoading(userLoader);
-    }
-    
+    /**
+     * When this event method is called the OAuth server is started, and the user is directed to GitHub Login.
+     * The server will call OauthSuccessEvent when if it is successful.
+     */
     public static void OauthSigninEvent(){
         if(oauthServer == null){
             oauthServer = new OauthServer();
+            mw.displayError("Starting oauth server...", 1000);
         }
         try{
             Desktop.getDesktop().browse(new URI("https://github.com/login/oauth/authorize?scope=repo%20delete_repo&client_id=857a7c08677c3c027965"));
@@ -71,11 +48,48 @@ public class Main{
             e.printStackTrace();
         }
     } 
+    /**
+     * When this event method is called, it trades the code from the login for a token, it then tries to re load the main user.
+     * @param code 
+     */
+    public static void OauthSuccessEvent(String code){
+        String token = API.tradeCode(code);
+        Settings.getInstance().setToken(token, true); // Saving settings based off of token.
+        new API(token); // Setting API to use new token.
+        Thread userLoader = new Thread(() -> User.loadMainUser()); // Starting user load thread which will call mainUserLoadedEvent to update the view.
+        userLoader.start();
+        mw.startLoading(userLoader); // Makes the application load until the thread is done.
+    }
+    /**
+     * This function is for Personal Access Tokens. Since we already have the token, we retry loading the main user.
+     * @param token 
+     */
+    public static void tokenSignInEvent(String token){
+        Settings.getInstance().setToken(token, false);
+        new API(token);
+        Thread userLoader = new Thread(() -> User.loadMainUser()); 
+        userLoader.start();
+        mw.startLoading(userLoader);
+    }
+    /**
+     * When the main user is successfully loaded, the Application is alerted.
+     */
+    public static void mainUserLoadedEvent(){
+        userLoaded = true;
+        mw.setUser(User.getMainUser());
+    }
+    /**
+     * When another user is searched for, check the cache for an existing search, if not use GitHub.API to search. Update cache and Application.
+     * @param login 
+     */
     public static void LoginSearchEvent(String login){
         User searchedUser = userCache.get(login);
         if(searchedUser == null){
             searchedUser = User.fromLogin(login);
-            if(searchedUser != null){
+            if(searchedUser == null){
+                mw.displayError("Login does not exist.", 3000);
+            }
+            else{
                 userCache.add(searchedUser);
                 mw.setUser(searchedUser);
             }
@@ -84,7 +98,9 @@ public class Main{
             mw.setUser(searchedUser);
         }
     }
-    
+    /**
+     * Function to load the file into the HashMap for the Language Colors.
+     */
     public static void loadGithubColors(){
         try{
             Reader jsonFile = new FileReader("githubLangColors.json");
@@ -96,31 +112,22 @@ public class Main{
     }
 
     public static void main(String[] args){
-        // This approach uses an http request library to directly talk to the github api, More work but more control.
-        
-        FlatDarculaLaf.setup();
-        loadGithubColors();
-        settingsLoaded = Settings.load();
+        // Setup
+        FlatDarculaLaf.setup(); // Start Laf Manager.
+        loadGithubColors(); // Load the Language Colors.
+        settingsLoaded = Settings.load(); // Try to read local settings.
+        // Init
         mw = new MainWin();
         userCache = new UserCache(3);
         userLoaded = false;
         
-        if(settingsLoaded){
-            if(Settings.getInstance().isOauthToken()){
-                System.out.println("Loaded OauthToken");
-            }
+        if(settingsLoaded){ // If the settings were successfully loaded, try use the loaded token and load the main user.
             new API(Settings.getInstance().getToken());
             Thread userLoader = new Thread(() -> User.loadMainUser()); 
             userLoader.start();
             mw.startLoading(userLoader);
         }
-        
-//        if(userLoaded){
-//            mw.setUser(User.getMainUser());
-//        }
-//        else if(Settings.getInstance().isOauthToken()){
-//            OauthSigninEvent();
-//        }
+        // Else wait for the user to login.
         mw.setVisible(true);
     }
 }

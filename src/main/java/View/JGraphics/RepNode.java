@@ -9,6 +9,11 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
 
+/**
+ * This class renders a Rep onto the Timeline.
+ * It consists of a start, end, and bar inbetween.
+ * Each bar generates a nice random pastel color.
+ */
 public class RepNode extends RectBound implements Drawable{
     public static Random random = new Random();
     public static Color generateRepColor(){
@@ -16,16 +21,16 @@ public class RepNode extends RectBound implements Drawable{
         return c;
     }
     private boolean isSingleDate;
-    
     private String name;
-    private Rep rep;
+    
+    private Rep rep; // Rep to render.
     private LocalDate startingDate;
     private LocalDate endingDate;
-    private TimePoint start;
-    private TimePoint end;
-    private TimePeriodBar bar;
+    private TimePoint start; // Point for the starting date.
+    private TimePoint end; // Point for the endingDate.
+    private TimePeriodBar bar; // Rep Bar.
     private TimePanel.Mode mode;
-    private Color color = Color.ORANGE;
+    private Color color = Color.ORANGE; // Defaults to orange for single date spanning Reps because they are not temporally interesting.
     
     public RepNode(Rep r, TemporalNode startingDateNode, TemporalNode endingDateNode, TimePanel.Mode mode, int timepointY, int space){
         super();
@@ -46,18 +51,6 @@ public class RepNode extends RectBound implements Drawable{
             this.end = new TimePoint(endingDateNode, timepointY, Color.RED);
          
         }
-//        if(isSingleDate){
-//            this.start = new TimePoint(r.getDateCreated(), minDate, this.mode, space, timepointY, Color.ORANGE);
-//            this.end = new TimePoint(r.getDateLastPushed(), minDate, this.mode, space, timepointY, Color.ORANGE);
-//        }
-//        else{
-//            System.out.println(name);
-//            this.start = new TimePoint(r.getDateCreated(), minDate, this.mode, space, timepointY, Color.GREEN);
-//            this.end = new TimePoint(r.getDateLastPushed(), minDate, this.mode, space, timepointY, Color.RED);
-//            start.debug();
-//            end.debug();
-//            System.out.println();
-//        }
         this.bar = new TimePeriodBar(start, end, generateRepColor());
     }
     
@@ -71,6 +64,12 @@ public class RepNode extends RectBound implements Drawable{
     public boolean inDateRange(){
         return false;
     }
+    /**
+     * Checks if the Repository is in the sliding window at all.
+     * @param x1
+     * @param x2
+     * @return A Boolean indicating if it does.
+     */
     public boolean InXRange(int x1, int x2){
         start.InXRange(x1, x2);
         end.InXRange(x1, x2); 
@@ -88,17 +87,9 @@ public class RepNode extends RectBound implements Drawable{
         bar.zoomUpdate();
     }
     public void draw(Graphics g, int minX, int tickH){
-//        if(mode == TimePanel.Mode.MONTHS){
-//            System.out.println(name + ": " + start.getNumMonths());
-//        }
-//        else if(mode == TimePanel.Mode.YEARS){
-//            System.out.println(name + ": " + start.getNumYears());
-//        }
-//        else{
-//            System.out.println(name + ": " + start.getNumDays());
-//        }
+        
         start.draw(g, minX, tickH);
-        if(!isSingleDate){
+        if(!isSingleDate){// excludes single date spanning Reps because they are not temporally interesting.
             end.draw(g, minX, tickH);
             bar.draw(g, minX, name, isSingleDate);
         }
@@ -119,7 +110,10 @@ public class RepNode extends RectBound implements Drawable{
     public LocalDate getEndingDate() {
         return endingDate;
     }
-    
+    /**
+     * Controls its Y when RepNodes are stacked.
+     * @param i 
+     */
     public void setI(int i){
         this.bar.setI(i);
     }

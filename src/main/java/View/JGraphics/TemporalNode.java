@@ -5,12 +5,13 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.time.LocalDate;
 
+/**
+ * This class represents dates on the Timeline. It simply takes a data string and draws a tick on the timeline.
+ */
 public class TemporalNode extends RectBound implements Drawable{
     private static int diam = 4;
     private static int halfDiam = 2;
    
-    //private LocalDate date;
-    //private TimePanel.Mode mode;
     private int i;
     private boolean isBottomNode;
     private String name;
@@ -19,15 +20,12 @@ public class TemporalNode extends RectBound implements Drawable{
         super((i + 1) * space, y, diam, diam);
         this.i = i;
         this.isBottomNode = isBottomNode;
-        //this.mode = mode;
         
         this.y -= halfDiam;
         
         this.name = name;
     }
-//    public LocalDate getDate(){
-//        return date;
-//    }
+
     public void zoomUpdate(int space){
         this.x = (i + 1) * space;
     }
@@ -41,8 +39,7 @@ public class TemporalNode extends RectBound implements Drawable{
         int halfTextW = textW / 2;
         int halfTextH = textH / 2;
         int newX = x - minX - halfDiam;
-
-        //g.setColor(Color.DARK_GRAY);
+        
         g.setColor(Color.WHITE);
         g.fillRect(newX + 1, y + halfDiam, 2, tickH);
         

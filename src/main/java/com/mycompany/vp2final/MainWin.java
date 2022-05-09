@@ -2,8 +2,10 @@ package com.mycompany.vp2final;
 
 import Model.User;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 
 public class MainWin extends javax.swing.JFrame{
     private static class followersSearchedAction extends AbstractAction{
@@ -20,15 +22,40 @@ public class MainWin extends javax.swing.JFrame{
     }
     
     private User user;
-    private Thread labelChanger;
+    private Thread LoadingLabelChanger;
+    private Thread ErrorLabelChanger;
     
     public MainWin() {
         initComponents();
         lblLoading.setVisible(false);
         searchUserPanel.setVisible(false);
+        socialMenu.setEnabled(false);
+        viewMenu.setEnabled(false);
+        setPreferredSize(new Dimension(400, 500));
+        pack();
+    }
+ 
+    public void displayError(String msg, int dur){
+        ErrorLabelChanger = new Thread(new Runnable(){
+            public void run(){
+                lblError.setText(msg);
+                lblError.setVisible(true);
+                
+                try{
+                  Thread.sleep(dur);      
+                }
+                catch(InterruptedException e){
+                    
+                }
+                lblError.setText("");
+                lblError.setVisible(false);
+            }
+        });
+        ErrorLabelChanger.start();
     }
     public void startLoading(Thread loadingThread){
-        labelChanger = new Thread(new Runnable(){
+        signInPanel.loading(true);
+        LoadingLabelChanger = new Thread(new Runnable(){
             public void run(){
                 lblLoading.setVisible(true);
                 while(loadingThread.isAlive()){
@@ -50,9 +77,10 @@ public class MainWin extends javax.swing.JFrame{
                     }
                 }
                 lblLoading.setVisible(false);
+                signInPanel.loading(false);
             }
         });
-        labelChanger.start();
+        LoadingLabelChanger.start();
     }
     public void reset(){
         searchUserPanel.setVisible(false);
@@ -68,18 +96,21 @@ public class MainWin extends javax.swing.JFrame{
         
         winTimeline.setUser(user);
         
-        if(user.ownsMediaRep()){
+        if(this.user.isMainUser()){
             repMediaManagerPanel.setUser(user);
         }
-        else{
-            repMediaManagerPanel.clear();
-        }
-        changePanel("timelineWindow");
+        changePanel("timelineWindow", winTimeline.getPreferredSize());
+        socialMenu.setEnabled(true);
+        viewMenu.setEnabled(true);
         updateFollowing();
     }
-    public void changePanel(String cardName){
+    public void changePanel(String cardName, Dimension size){
         CardLayout cardLayout = (CardLayout)pnlMain.getLayout();
         cardLayout.show(pnlMain, cardName);
+        setPreferredSize(size);
+        pack();
+        repaint();
+        revalidate();
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -93,31 +124,37 @@ public class MainWin extends javax.swing.JFrame{
         jMenuItem1 = new javax.swing.JMenuItem();
         pnlMain = new javax.swing.JPanel();
         signInPanel = new View.SignInPanel();
-        repMediaManagerPanel = new View.RepMediaManagerPanel();
         winTimeline = new View.TimelineWindowPanel();
+        repMediaManagerPanel = new View.RepMediaManagerPanel();
         searchUserPanel = new View.SearchUserPanel();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
         lblLoading = new javax.swing.JLabel();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 5), new java.awt.Dimension(0, 5), new java.awt.Dimension(32767, 5));
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
+        lblError = new javax.swing.JLabel();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 8), new java.awt.Dimension(0, 8), new java.awt.Dimension(32767, 8));
+        userMenu = new javax.swing.JMenuBar();
+        socialMenu = new javax.swing.JMenu();
         itemSocialMe = new javax.swing.JMenuItem();
         itemSocialSearch = new javax.swing.JMenuItem();
         itemSocialFollowing = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
+        viewMenu = new javax.swing.JMenu();
         itemViewTimeline = new javax.swing.JMenuItem();
         itemViewRepMedia = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
+        settingsMenu = new javax.swing.JMenu();
 
         jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("GitSocial");
+        setIconImage(new ImageIcon("gs.jpeg").getImage());
+        setMaximumSize(new java.awt.Dimension(1650, 900));
+        setPreferredSize(new java.awt.Dimension(1650, 900));
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
             }
         });
 
+        pnlMain.setPreferredSize(new java.awt.Dimension(1650, 800));
         pnlMain.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 pnlMainMouseClicked(evt);
@@ -125,7 +162,6 @@ public class MainWin extends javax.swing.JFrame{
         });
         pnlMain.setLayout(new java.awt.CardLayout());
         pnlMain.add(signInPanel, "signInPanel");
-        pnlMain.add(repMediaManagerPanel, "repMediaManagerPanel");
 
         winTimeline.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -133,6 +169,7 @@ public class MainWin extends javax.swing.JFrame{
             }
         });
         pnlMain.add(winTimeline, "timelineWindow");
+        pnlMain.add(repMediaManagerPanel, "repMediaManagerPanel");
 
         searchUserPanel.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -144,10 +181,16 @@ public class MainWin extends javax.swing.JFrame{
         lblLoading.setText("Loading.");
         lblLoading.setEnabled(false);
 
-        jMenu1.setText("Social");
-        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+        filler2.setBackground(new java.awt.Color(204, 204, 204));
+
+        lblError.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblError.setForeground(new java.awt.Color(255, 102, 102));
+        lblError.setEnabled(false);
+
+        socialMenu.setText("Social");
+        socialMenu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenu1ActionPerformed(evt);
+                socialMenuActionPerformed(evt);
             }
         });
 
@@ -157,7 +200,7 @@ public class MainWin extends javax.swing.JFrame{
                 itemSocialMeActionPerformed(evt);
             }
         });
-        jMenu1.add(itemSocialMe);
+        socialMenu.add(itemSocialMe);
 
         itemSocialSearch.setText("Search");
         itemSocialSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -165,7 +208,7 @@ public class MainWin extends javax.swing.JFrame{
                 itemSocialSearchActionPerformed(evt);
             }
         });
-        jMenu1.add(itemSocialSearch);
+        socialMenu.add(itemSocialSearch);
 
         itemSocialFollowing.setText("Following");
         itemSocialFollowing.addItemListener(new java.awt.event.ItemListener() {
@@ -178,11 +221,11 @@ public class MainWin extends javax.swing.JFrame{
                 itemSocialFollowingActionPerformed(evt);
             }
         });
-        jMenu1.add(itemSocialFollowing);
+        socialMenu.add(itemSocialFollowing);
 
-        jMenuBar1.add(jMenu1);
+        userMenu.add(socialMenu);
 
-        jMenu2.setText("View");
+        viewMenu.setText("View");
 
         itemViewTimeline.setText("Timeline");
         itemViewTimeline.addActionListener(new java.awt.event.ActionListener() {
@@ -190,7 +233,7 @@ public class MainWin extends javax.swing.JFrame{
                 itemViewTimelineActionPerformed(evt);
             }
         });
-        jMenu2.add(itemViewTimeline);
+        viewMenu.add(itemViewTimeline);
 
         itemViewRepMedia.setText("Rep Media");
         itemViewRepMedia.addActionListener(new java.awt.event.ActionListener() {
@@ -198,14 +241,14 @@ public class MainWin extends javax.swing.JFrame{
                 itemViewRepMediaActionPerformed(evt);
             }
         });
-        jMenu2.add(itemViewRepMedia);
+        viewMenu.add(itemViewRepMedia);
 
-        jMenuBar1.add(jMenu2);
+        userMenu.add(viewMenu);
 
-        jMenu3.setText("Settings");
-        jMenuBar1.add(jMenu3);
+        settingsMenu.setText("Settings");
+        userMenu.add(settingsMenu);
 
-        setJMenuBar(jMenuBar1);
+        setJMenuBar(userMenu);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -214,32 +257,32 @@ public class MainWin extends javax.swing.JFrame{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 2050, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(filler1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(pnlMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1588, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(searchUserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(34, 34, 34)
-                        .addComponent(filler2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblLoading, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(searchUserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblError, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(filler2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(searchUserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(lblLoading, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(filler2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(lblLoading, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(searchUserPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblError, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, 0)
+                .addComponent(filler2, javax.swing.GroupLayout.PREFERRED_SIZE, 8, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlMain, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlMain, javax.swing.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -247,16 +290,16 @@ public class MainWin extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void itemViewTimelineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemViewTimelineActionPerformed
-        changePanel("timelineWindow");
+        changePanel("timelineWindow", winTimeline.getPreferredSize());
     }//GEN-LAST:event_itemViewTimelineActionPerformed
 
     private void itemViewRepMediaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemViewRepMediaActionPerformed
-        changePanel("repMediaManagerPanel");
+        changePanel("repMediaManagerPanel", repMediaManagerPanel.getPreferredSize());
     }//GEN-LAST:event_itemViewRepMediaActionPerformed
 
-    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+    private void socialMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_socialMenuActionPerformed
      
-    }//GEN-LAST:event_jMenu1ActionPerformed
+    }//GEN-LAST:event_socialMenuActionPerformed
 
     private void itemSocialSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemSocialSearchActionPerformed
         
@@ -299,16 +342,17 @@ public class MainWin extends javax.swing.JFrame{
     private javax.swing.JMenuItem itemSocialSearch;
     private javax.swing.JMenuItem itemViewRepMedia;
     private javax.swing.JMenuItem itemViewTimeline;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JLabel lblError;
     private javax.swing.JLabel lblLoading;
     private javax.swing.JPanel pnlMain;
     private View.RepMediaManagerPanel repMediaManagerPanel;
     private View.SearchUserPanel searchUserPanel;
+    private javax.swing.JMenu settingsMenu;
     private View.SignInPanel signInPanel;
+    private javax.swing.JMenu socialMenu;
+    private javax.swing.JMenuBar userMenu;
+    private javax.swing.JMenu viewMenu;
     private View.TimelineWindowPanel winTimeline;
     // End of variables declaration//GEN-END:variables
 }
